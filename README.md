@@ -8,6 +8,10 @@
 </p>
 
 <p align="center">
+  <strong>English</strong> | <a href="README-ZH.md">中文</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/Ravomi/ravomi-app">Explore the project</a>
   &nbsp;·&nbsp;
   <a href="https://github.com/Ravomi/ravomi-app/blob/main/PRD.md">Product direction</a>
