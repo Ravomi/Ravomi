@@ -40,3 +40,13 @@ Ravomi is an early prototype. The repository currently centers on a local canvas
 We are developing a workspace that stays clear as the work grows: quiet surfaces, legible connections, and a small graphite cat with a restrained blue-violet glow.
 
 Follow the [repository](https://github.com/Ravomi/ravomi-app) for implementation progress, design decisions, and documented limitations.
+
+---
+
+### Support Ravomi's open source work
+
+使用银行卡：
+https://buy.stripe.com/test_aFa8wPgsQ5JS2ECdE7ejK01
+
+或使用USDT-TRC20：
+`TKm4yqSdPyEwXYiPybsAZkMT6N6uzTJPCp`
