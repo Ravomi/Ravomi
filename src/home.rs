@@ -279,12 +279,12 @@ impl Home {
                 ui.painter().rect_filled(screen, 0.0, colors.surface);
                 ui.painter().rect_filled(
                     egui::Rect::from_min_max(egui::pos2(sidebar_width, rect.top()), rect.max),
-                    12.0,
+                    8.0,
                     colors.ink,
                 );
                 ui.painter().rect_stroke(
                     egui::Rect::from_min_max(egui::pos2(sidebar_width, rect.top()), rect.max),
-                    12.0,
+                    8.0,
                     egui::Stroke::new(1.0, colors.border),
                     egui::StrokeKind::Inside,
                 );
@@ -303,7 +303,7 @@ impl Home {
                     .max_height(sidebar.height())
                     .auto_shrink([false, false])
                     .show(&mut nav, |nav| {
-                        theme::chrome_style(nav, light);
+                        theme::chrome_style(nav, false);
                         nav.spacing_mut().interact_size.y = 38.0;
                         nav.spacing_mut().item_spacing = egui::vec2(10.0, 5.0);
                         nav.spacing_mut().button_padding = egui::vec2(14.0, 6.0);
@@ -339,7 +339,7 @@ impl Home {
                                 nav_button(&self.icons, 18, "新建画布", colors.on_primary, 14.0)
                                     .frame(true)
                                     .fill(colors.primary)
-                                    .corner_radius(12),
+                                    .corner_radius(6),
                             )
                             .clicked()
                         {
@@ -359,7 +359,7 @@ impl Home {
                             nav_button(&self.icons, 17, "最近打开", colors.foreground, 13.0)
                                 .frame(true)
                                 .selected(true)
-                                .corner_radius(12),
+                                .corner_radius(6),
                         );
                         if nav
                             .add_sized(
@@ -419,52 +419,9 @@ impl Home {
                         .max_rect(content)
                         .layout(egui::Layout::top_down(egui::Align::Min)),
                 );
-                theme::chrome_style(&mut body, light);
+                theme::chrome_style(&mut body, false);
                 body.spacing_mut().interact_size.y = 18.0;
                 body.spacing_mut().item_spacing.y = 4.0;
-                let compact = content.width() < 520.0 || content.height() < 450.0;
-                let (hero, _) = body.allocate_exact_size(
-                    egui::vec2(content.width(), if compact { 108.0 } else { 132.0 }),
-                    egui::Sense::hover(),
-                );
-                let painter = body.painter();
-                painter.text(
-                    hero.min + egui::vec2(12.0, 20.0),
-                    egui::Align2::LEFT_CENTER,
-                    "你的工作空间",
-                    egui::FontId::proportional(12.0),
-                    colors.muted,
-                );
-                painter.text(
-                    hero.min + egui::vec2(12.0, 64.0),
-                    egui::Align2::LEFT_CENTER,
-                    "让灵感安静生长",
-                    egui::FontId::proportional(if compact { 26.0 } else { 36.0 }),
-                    colors.foreground,
-                );
-                if !compact {
-                    painter.text(
-                        hero.min + egui::vec2(12.0, 106.0),
-                        egui::Align2::LEFT_CENTER,
-                        "记录、连接，逐步展开你的工作。",
-                        egui::FontId::proportional(17.0),
-                        colors.muted,
-                    );
-                    if let Some(avatar) = &self.avatar {
-                        let image = egui::Rect::from_min_size(
-                            egui::pos2(hero.right() - 150.0, hero.top()),
-                            egui::vec2(136.0, 136.0),
-                        );
-                        painter.image(
-                            avatar.id(),
-                            image,
-                            egui::Rect::from_min_max(egui::Pos2::ZERO, egui::pos2(1.0, 1.0)),
-                            egui::Color32::WHITE,
-                        );
-                    }
-                }
-                body.separator();
-                body.add_space(16.0);
                 body.horizontal(|ui| {
                     ui.label(egui::RichText::new("我的画布").size(23.0).strong());
                     ui.label(
@@ -490,8 +447,9 @@ impl Home {
                                 .frame(
                                     egui::Frame::new()
                                         .fill(colors.surface)
+                                        .stroke(egui::Stroke::new(1.0, colors.border))
                                         .inner_margin(10.0)
-                                        .corner_radius(12),
+                                        .corner_radius(6),
                                 ),
                         );
                         if self.focus_search {
@@ -818,8 +776,8 @@ impl Home {
                 ui.painter().rect_filled(
                     tab,
                     egui::CornerRadius {
-                        nw: 10,
-                        ne: 10,
+                        nw: 6,
+                        ne: 6,
                         sw: 0,
                         se: 0,
                     },
@@ -961,14 +919,14 @@ fn recent_card(ui: &egui::Ui, card: egui::Rect, recent: &Recent, highlighted: bo
     let colors = theme::home_palette();
     let painter = ui.painter().with_clip_rect(card.intersect(ui.clip_rect()));
     let inner = card.shrink(1.0);
-    painter.rect_filled(inner, 12.0, colors.surface);
+    painter.rect_filled(inner, 8.0, colors.surface);
     painter.rect_stroke(
         inner,
-        12.0,
+        8.0,
         egui::Stroke::new(
             1.0,
             if highlighted {
-                colors.active
+                colors.muted
             } else {
                 colors.border
             },
@@ -1393,5 +1351,100 @@ mod tests {
             doc.path.is_some(),
             "cleanup does not close the in-memory document"
         );
+    }
+
+    #[test]
+    fn shadcn_zinc_dark_theme_and_home_without_hero_banner() {
+        let ctx = egui::Context::default();
+        theme::apply(&ctx, false);
+
+        let style = ctx.style_of(egui::Theme::Dark);
+        let v = &style.visuals;
+        assert_eq!(v.panel_fill, egui::Color32::from_rgb(9, 9, 11));
+        assert_eq!(v.window_fill, egui::Color32::from_rgb(9, 9, 11));
+        assert_eq!(v.faint_bg_color, egui::Color32::from_rgb(24, 24, 27));
+        assert_eq!(
+            v.window_stroke,
+            egui::Stroke::new(1.0, egui::Color32::from_rgb(39, 39, 42))
+        );
+        assert_eq!(
+            v.override_text_color,
+            Some(egui::Color32::from_rgb(250, 250, 250))
+        );
+        assert_eq!(
+            v.weak_text_color,
+            Some(egui::Color32::from_rgb(161, 161, 170))
+        );
+        assert_eq!(v.window_corner_radius, egui::CornerRadius::same(8));
+        for widget in [
+            &v.widgets.noninteractive,
+            &v.widgets.inactive,
+            &v.widgets.hovered,
+            &v.widgets.active,
+            &v.widgets.open,
+        ] {
+            assert_eq!(widget.corner_radius, egui::CornerRadius::same(6));
+            assert_eq!(widget.expansion, 0.0);
+        }
+        assert_eq!(style.spacing.item_spacing, egui::vec2(8.0, 8.0));
+        assert_eq!(style.spacing.button_padding, egui::vec2(12.0, 6.0));
+        assert_eq!(
+            style.text_styles.get(&egui::TextStyle::Heading),
+            Some(&egui::FontId::proportional(20.0))
+        );
+        assert_eq!(
+            style.text_styles.get(&egui::TextStyle::Body),
+            Some(&egui::FontId::proportional(14.0))
+        );
+        assert_eq!(
+            style.text_styles.get(&egui::TextStyle::Small),
+            Some(&egui::FontId::proportional(12.0))
+        );
+        assert_eq!(
+            style.text_styles.get(&egui::TextStyle::Monospace),
+            Some(&egui::FontId::monospace(13.0))
+        );
+
+        let mut home = Home {
+            visible: true,
+            ..Default::default()
+        };
+        let mut output = egui::FullOutput::default();
+        for _ in 0..2 {
+            output.textures_delta.clear();
+            let input = egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(1280.0, 800.0),
+                )),
+                ..Default::default()
+            };
+            output = ctx.run_ui(input, |_| {
+                home.show(&ctx, false, |_| false);
+            });
+        }
+        output.textures_delta.clear();
+        fn collect_texts(shape: &egui::Shape, out: &mut Vec<String>) {
+            match shape {
+                egui::Shape::Text(text) => out.push(text.galley.job.text.clone()),
+                egui::Shape::Vec(shapes) => {
+                    for s in shapes {
+                        collect_texts(s, out);
+                    }
+                }
+                _ => {}
+            }
+        }
+        let mut texts = Vec::new();
+        for clipped in &output.shapes {
+            collect_texts(&clipped.shape, &mut texts);
+        }
+        assert!(texts.iter().any(|t| t == "我的画布"), "texts: {texts:?}");
+        assert!(texts.iter().any(|t| t == "最近打开"), "texts: {texts:?}");
+        assert!(!texts.iter().any(|t| t.contains("你的工作空间")));
+        assert!(!texts.iter().any(|t| t.contains("让灵感安静生长")));
+        assert!(!texts
+            .iter()
+            .any(|t| t.contains("记录、连接，逐步展开你的工作。")));
     }
 }

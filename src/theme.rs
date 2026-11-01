@@ -144,38 +144,52 @@ pub fn dock_frame(light: bool) -> egui::Frame {
     egui::Frame::new()
         .fill(p.surface)
         .stroke(egui::Stroke::new(1.0, p.border))
-        .corner_radius(28)
-        .inner_margin(7.0)
+        .corner_radius(8)
+        .inner_margin(6.0)
 }
 
 pub fn dock_style(ui: &mut egui::Ui, light: bool) {
     let p = dock_palette(light);
     let visuals = ui.visuals_mut();
     visuals.override_text_color = Some(p.foreground);
-    visuals.selection.bg_fill = p.foreground.gamma_multiply(0.13);
-    visuals.selection.stroke = egui::Stroke::new(1.0, p.foreground);
+    visuals.selection.bg_fill = if light {
+        p.foreground.gamma_multiply(0.13)
+    } else {
+        p.border
+    };
+    visuals.selection.stroke = egui::Stroke::new(1.0, if light { p.foreground } else { p.muted });
     visuals.widgets.active.bg_stroke = egui::Stroke::NONE;
     visuals.widgets.hovered.bg_stroke = egui::Stroke::NONE;
     for widget in [
+        &mut visuals.widgets.noninteractive,
         &mut visuals.widgets.inactive,
         &mut visuals.widgets.hovered,
         &mut visuals.widgets.active,
         &mut visuals.widgets.open,
     ] {
-        widget.corner_radius = egui::CornerRadius::same(20);
+        widget.corner_radius = egui::CornerRadius::same(6);
         widget.expansion = 0.0;
     }
-    visuals.widgets.hovered.weak_bg_fill = p.foreground.gamma_multiply(0.08);
-    visuals.widgets.active.weak_bg_fill = p.foreground.gamma_multiply(0.13);
+    visuals.widgets.hovered.weak_bg_fill = if light {
+        p.foreground.gamma_multiply(0.08)
+    } else {
+        egui::Color32::from_rgb(63, 63, 70)
+    };
+    visuals.widgets.active.weak_bg_fill = if light {
+        p.foreground.gamma_multiply(0.13)
+    } else {
+        p.border
+    };
     visuals.widgets.open.weak_bg_fill = visuals.widgets.active.weak_bg_fill;
     ui.spacing_mut().interact_size.y = DOCK_ITEM;
     ui.spacing_mut().item_spacing.x = 4.0;
 }
 
 pub fn chrome_frame(light: bool) -> egui::Frame {
+    let p = chrome_palette(light);
     dock_frame(light)
-        .fill(chrome_palette(light).surface)
-        .stroke(egui::Stroke::new(1.0, egui::Color32::TRANSPARENT))
+        .fill(p.surface)
+        .stroke(egui::Stroke::new(1.0, p.border))
 }
 
 pub fn chrome_palette(light: bool) -> DockPalette {
@@ -192,15 +206,16 @@ pub fn chrome_palette(light: bool) -> DockPalette {
             on_primary: rgb(0xffffff),
         }
     } else {
+        // Shadcn (Zinc Dark) color system
         DockPalette {
-            surface: rgb(0x24242b),
-            border: rgb(0x494a55),
-            muted: rgb(0xb7b6c2),
-            foreground: rgb(0xf0eff4),
-            active: rgb(0xadb8d9),
-            ink: rgb(0x202126),
-            primary: rgb(0xf5f4ee),
-            on_primary: rgb(0x202126),
+            surface: rgb(0x18181b),    // zinc-900 (bg_muted)
+            border: rgb(0x27272a),     // zinc-800 (border_subtle / bg_secondary)
+            muted: rgb(0xa1a1aa),      // zinc-400 (fg_muted / border_focus)
+            foreground: rgb(0xfafafa), // zinc-50 (fg_primary)
+            active: rgb(0xfafafa),     // zinc-50
+            ink: rgb(0x09090b),        // zinc-950 (bg_background / bg_card)
+            primary: rgb(0xfafafa),    // zinc-50 (primary button fill)
+            on_primary: rgb(0x18181b), // zinc-900 (primary button text)
         }
     }
 }
@@ -210,31 +225,30 @@ pub fn chrome_style(ui: &mut egui::Ui, light: bool) {
     let p = chrome_palette(light);
     let visuals = ui.visuals_mut();
     visuals.override_text_color = Some(p.foreground);
-    visuals.widgets.inactive.weak_bg_fill = p.surface;
+    visuals.widgets.inactive.weak_bg_fill = if light { p.surface } else { p.border };
 }
 
-/// The reference home uses a fixed graphite appearance, independently of the canvas.
+/// The reference home uses Shadcn Zinc Dark appearance, independently of the canvas.
 pub fn home_palette() -> DockPalette {
-    let mut palette = chrome_palette(false);
-    palette.surface = egui::Color32::from_rgb(35, 37, 44);
-    palette.ink = egui::Color32::from_rgb(25, 27, 31);
-    palette.border = egui::Color32::from_rgb(57, 60, 70);
-    palette.muted = egui::Color32::from_rgb(164, 168, 180);
-    palette
+    chrome_palette(false)
 }
 
 pub fn tool_frame(light: bool) -> egui::Frame {
     let p = chrome_palette(light);
     egui::Frame::new()
-        .fill(egui_color(palette(light).canvas))
+        .fill(if light {
+            egui_color(palette(light).canvas)
+        } else {
+            p.ink
+        })
         .stroke(egui::Stroke::new(1.0, p.border))
-        .corner_radius(16)
+        .corner_radius(8)
         .inner_margin(16)
         .shadow(egui::epaint::Shadow {
             offset: [0, 4],
-            blur: 16,
+            blur: 12,
             spread: 0,
-            color: egui::Color32::from_black_alpha(if light { 18 } else { 40 }),
+            color: egui::Color32::from_black_alpha(if light { 18 } else { 60 }),
         })
 }
 
@@ -242,21 +256,34 @@ pub fn tool_style(ui: &mut egui::Ui, light: bool) {
     let p = chrome_palette(light);
     chrome_style(ui, light);
     ui.spacing_mut().interact_size.y = 32.0;
-    ui.spacing_mut().button_padding = egui::vec2(12.0, 7.0);
+    ui.spacing_mut().button_padding = egui::vec2(12.0, 6.0);
     ui.spacing_mut().item_spacing = egui::vec2(8.0, 8.0);
     let visuals = ui.visuals_mut();
-    visuals.extreme_bg_color = p.surface;
+    visuals.extreme_bg_color = if light { p.surface } else { p.ink };
     for widget in [
+        &mut visuals.widgets.noninteractive,
         &mut visuals.widgets.inactive,
         &mut visuals.widgets.hovered,
         &mut visuals.widgets.active,
         &mut visuals.widgets.open,
     ] {
-        widget.corner_radius = egui::CornerRadius::same(8);
-        widget.bg_stroke = egui::Stroke::NONE;
+        widget.corner_radius = egui::CornerRadius::same(6);
+        widget.bg_stroke = egui::Stroke::new(1.0, p.border);
         widget.expansion = 0.0;
     }
-    visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, p.active);
+    if !light {
+        visuals.widgets.inactive.bg_fill = p.border;
+        visuals.widgets.inactive.weak_bg_fill = p.border;
+        visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(63, 63, 70);
+        visuals.widgets.hovered.weak_bg_fill = egui::Color32::from_rgb(63, 63, 70);
+        visuals.widgets.hovered.bg_stroke =
+            egui::Stroke::new(1.0, egui::Color32::from_rgb(82, 82, 91));
+        visuals.widgets.active.bg_fill = p.surface;
+        visuals.widgets.active.weak_bg_fill = p.surface;
+        visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, p.muted);
+    } else {
+        visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, p.active);
+    }
 }
 
 pub fn close_button(ui: &mut egui::Ui, light: bool, label: &str) -> egui::Response {
@@ -264,7 +291,7 @@ pub fn close_button(ui: &mut egui::Ui, light: bool, label: &str) -> egui::Respon
     let response = ui.add(
         egui::Button::new("")
             .frame(false)
-            .corner_radius(8)
+            .corner_radius(6)
             .min_size(egui::vec2(32.0, 32.0)),
     );
     let center = response.rect.center();
@@ -310,9 +337,90 @@ pub fn primary_button<'a>(label: &'a str, light: bool) -> egui::Button<'a> {
     ))
     .fill(p.primary)
     .stroke(egui::Stroke::NONE)
-    .corner_radius(18)
+    .corner_radius(egui::CornerRadius::same(6))
     .min_size(egui::vec2(80.0, 36.0))
 }
+
+pub fn apply_shadcn_zinc_dark(ctx: &egui::Context) {
+    let bg_background = egui::Color32::from_rgb(9, 9, 11); // #09090b (zinc-950)
+    let bg_card = egui::Color32::from_rgb(9, 9, 11); // #09090b
+    let bg_muted = egui::Color32::from_rgb(24, 24, 27); // #18181b (zinc-900)
+    let bg_secondary = egui::Color32::from_rgb(39, 39, 42); // #27272a (zinc-800)
+
+    let border_subtle = egui::Color32::from_rgb(39, 39, 42); // #27272a (1px subtle border)
+    let border_focus = egui::Color32::from_rgb(161, 161, 170); // #a1a1aa (zinc-400)
+
+    let fg_primary = egui::Color32::from_rgb(250, 250, 250); // #fafafa (zinc-50)
+    let fg_muted = egui::Color32::from_rgb(161, 161, 170); // #a1a1aa (zinc-400)
+
+    let mut visuals = egui::Visuals::dark();
+
+    visuals.panel_fill = bg_background;
+    visuals.window_fill = bg_card;
+    visuals.extreme_bg_color = bg_background;
+    visuals.faint_bg_color = bg_muted;
+    visuals.weak_text_color = Some(fg_muted);
+    visuals.override_text_color = Some(fg_primary);
+
+    visuals.window_corner_radius = egui::CornerRadius::same(8);
+    visuals.window_stroke = egui::Stroke::new(1.0, border_subtle);
+    visuals.window_shadow = egui::epaint::Shadow {
+        offset: [0, 4],
+        blur: 12,
+        spread: 0,
+        color: egui::Color32::from_black_alpha(60),
+    };
+    visuals.popup_shadow = egui::epaint::Shadow {
+        offset: [0, 2],
+        blur: 8,
+        spread: 0,
+        color: egui::Color32::from_black_alpha(50),
+    };
+
+    let radius_md = egui::CornerRadius::same(6);
+
+    visuals.widgets.noninteractive.bg_fill = bg_background;
+    visuals.widgets.noninteractive.weak_bg_fill = bg_background;
+    visuals.widgets.noninteractive.bg_stroke = egui::Stroke::new(1.0, border_subtle);
+    visuals.widgets.noninteractive.fg_stroke = egui::Stroke::new(1.0, fg_muted);
+    visuals.widgets.noninteractive.corner_radius = radius_md;
+    visuals.widgets.noninteractive.expansion = 0.0;
+
+    visuals.widgets.inactive.bg_fill = bg_secondary;
+    visuals.widgets.inactive.weak_bg_fill = bg_secondary;
+    visuals.widgets.inactive.bg_stroke = egui::Stroke::new(1.0, border_subtle);
+    visuals.widgets.inactive.fg_stroke = egui::Stroke::new(1.0, fg_primary);
+    visuals.widgets.inactive.corner_radius = radius_md;
+    visuals.widgets.inactive.expansion = 0.0;
+
+    visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(63, 63, 70); // zinc-700
+    visuals.widgets.hovered.weak_bg_fill = egui::Color32::from_rgb(63, 63, 70);
+    visuals.widgets.hovered.bg_stroke =
+        egui::Stroke::new(1.0, egui::Color32::from_rgb(82, 82, 91));
+    visuals.widgets.hovered.fg_stroke = egui::Stroke::new(1.0, fg_primary);
+    visuals.widgets.hovered.corner_radius = radius_md;
+    visuals.widgets.hovered.expansion = 0.0;
+
+    visuals.widgets.active.bg_fill = bg_muted;
+    visuals.widgets.active.weak_bg_fill = bg_muted;
+    visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, border_focus);
+    visuals.widgets.active.fg_stroke = egui::Stroke::new(1.0, fg_primary);
+    visuals.widgets.active.corner_radius = radius_md;
+    visuals.widgets.active.expansion = 0.0;
+
+    visuals.widgets.open.bg_fill = bg_secondary;
+    visuals.widgets.open.weak_bg_fill = bg_secondary;
+    visuals.widgets.open.bg_stroke = egui::Stroke::new(1.0, border_focus);
+    visuals.widgets.open.fg_stroke = egui::Stroke::new(1.0, fg_primary);
+    visuals.widgets.open.corner_radius = radius_md;
+    visuals.widgets.open.expansion = 0.0;
+
+    visuals.selection.bg_fill = bg_secondary;
+    visuals.selection.stroke = egui::Stroke::new(1.0, border_focus);
+
+    ctx.set_visuals(visuals);
+}
+
 pub fn apply(ctx: &egui::Context, light: bool) {
     let egui_theme = if light {
         egui::Theme::Light
@@ -320,43 +428,47 @@ pub fn apply(ctx: &egui::Context, light: bool) {
         egui::Theme::Dark
     };
     ctx.set_theme(egui_theme);
-    let p = palette(light);
-    let mut visuals = if light {
-        egui::Visuals::light()
+    if !light {
+        apply_shadcn_zinc_dark(ctx);
     } else {
-        egui::Visuals::dark()
-    };
-    visuals.window_fill = egui_color(p.surface);
-    visuals.panel_fill = egui_color(p.surface);
-    let chrome = chrome_palette(light);
-    visuals.window_stroke = egui::Stroke::new(1.0, egui_color(p.border));
-    visuals.extreme_bg_color = egui_color(p.canvas);
-    visuals.faint_bg_color = chrome.surface;
-    visuals.weak_text_color = Some(chrome.muted);
-    for widget in [
-        &mut visuals.widgets.noninteractive,
-        &mut visuals.widgets.inactive,
-        &mut visuals.widgets.hovered,
-        &mut visuals.widgets.active,
-        &mut visuals.widgets.open,
-    ] {
-        widget.bg_fill = chrome.surface;
-        widget.weak_bg_fill = chrome.surface;
-        widget.bg_stroke = egui::Stroke::new(1.0, egui_color(p.border));
-        widget.fg_stroke = egui::Stroke::new(1.0, chrome.foreground);
+        let p = palette(true);
+        let mut visuals = egui::Visuals::light();
+        visuals.window_fill = egui_color(p.surface);
+        visuals.panel_fill = egui_color(p.surface);
+        let chrome = chrome_palette(true);
+        visuals.window_stroke = egui::Stroke::new(1.0, egui_color(p.border));
+        visuals.extreme_bg_color = egui_color(p.canvas);
+        visuals.faint_bg_color = chrome.surface;
+        visuals.weak_text_color = Some(chrome.muted);
+        for widget in [
+            &mut visuals.widgets.noninteractive,
+            &mut visuals.widgets.inactive,
+            &mut visuals.widgets.hovered,
+            &mut visuals.widgets.active,
+            &mut visuals.widgets.open,
+        ] {
+            widget.bg_fill = chrome.surface;
+            widget.weak_bg_fill = chrome.surface;
+            widget.bg_stroke = egui::Stroke::new(1.0, egui_color(p.border));
+            widget.fg_stroke = egui::Stroke::new(1.0, chrome.foreground);
+            widget.corner_radius = egui::CornerRadius::same(6);
+            widget.expansion = 0.0;
+        }
+        visuals.widgets.hovered.weak_bg_fill = chrome.border;
+        visuals.widgets.active.weak_bg_fill = chrome.border;
+        visuals.override_text_color = Some(egui_color(p.text));
+        visuals.selection.bg_fill = egui_color(p.accent).gamma_multiply(0.35);
+        visuals.selection.stroke = egui::Stroke::new(1.0, egui_color(p.accent));
+        visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, egui_color(p.accent));
+        visuals.widgets.hovered.bg_stroke = egui::Stroke::new(1.0, egui_color(p.accent));
+        visuals.window_corner_radius = egui::CornerRadius::same(8);
+        ctx.set_visuals(visuals);
     }
-    visuals.widgets.hovered.weak_bg_fill = chrome.border;
-    visuals.widgets.active.weak_bg_fill = chrome.border;
-    visuals.override_text_color = Some(egui_color(p.text));
-    visuals.selection.bg_fill = egui_color(p.accent).gamma_multiply(0.35);
-    visuals.selection.stroke = egui::Stroke::new(1.0, egui_color(p.accent));
-    visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, egui_color(p.accent));
-    visuals.widgets.hovered.bg_stroke = egui::Stroke::new(1.0, egui_color(p.accent));
-    visuals.window_corner_radius = egui::CornerRadius::same(16);
-    ctx.set_visuals(visuals);
     ctx.style_mut_of(egui_theme, |style| {
         style.spacing.item_spacing = egui::vec2(8.0, 8.0);
-        style.spacing.button_padding = egui::vec2(8.0, 4.0);
+        style.spacing.button_padding = egui::vec2(12.0, 6.0);
+        style.spacing.window_margin = egui::Margin::same(16);
+        style.spacing.menu_margin = egui::Margin::same(6);
         style
             .text_styles
             .insert(egui::TextStyle::Body, egui::FontId::proportional(14.0));
@@ -365,7 +477,13 @@ pub fn apply(ctx: &egui::Context, light: bool) {
             .insert(egui::TextStyle::Button, egui::FontId::proportional(14.0));
         style
             .text_styles
-            .insert(egui::TextStyle::Heading, egui::FontId::proportional(16.0));
+            .insert(egui::TextStyle::Heading, egui::FontId::proportional(20.0));
+        style
+            .text_styles
+            .insert(egui::TextStyle::Small, egui::FontId::proportional(12.0));
+        style
+            .text_styles
+            .insert(egui::TextStyle::Monospace, egui::FontId::monospace(13.0));
     });
 }
 
