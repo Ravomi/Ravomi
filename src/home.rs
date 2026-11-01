@@ -423,6 +423,8 @@ impl Home {
                 body.spacing_mut().interact_size.y = 18.0;
                 body.spacing_mut().item_spacing.y = 4.0;
                 body.horizontal(|ui| {
+                    ui.set_height(36.0);
+                    ui.spacing_mut().interact_size.y = 36.0;
                     ui.label(egui::RichText::new("我的画布").size(23.0).strong());
                     ui.label(
                         egui::RichText::new(self.recent.len().to_string())
@@ -430,29 +432,70 @@ impl Home {
                             .color(colors.muted),
                     );
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        if view_button(ui, true, self.list_view).clicked() {
+                        ui.set_height(36.0);
+                        ui.spacing_mut().item_spacing.x = 6.0;
+                        let list_btn = view_button(ui, true, self.list_view);
+                        if list_btn.clicked() {
                             self.list_view = true;
                         }
-                        if view_button(ui, false, !self.list_view).clicked() {
+                        let grid_btn = view_button(ui, false, !self.list_view);
+                        if grid_btn.clicked() {
                             self.list_view = false;
                         }
-                        let search = ui.add(
-                            egui::TextEdit::singleline(&mut self.search)
-                                .hint_text("搜索最近文件")
-                                .desired_width(if content.width() > 700.0 {
-                                    170.0
-                                } else {
-                                    130.0
-                                })
-                                .frame(
-                                    egui::Frame::new()
-                                        .fill(colors.surface)
-                                        .stroke(egui::Stroke::new(1.0, colors.border))
-                                        .inner_margin(10.0)
-                                        .corner_radius(6),
-                                ),
+                        let search_width = if content.width() > 700.0 {
+                            190.0
+                        } else {
+                            146.0
+                        };
+                        let (search_rect, _) = ui.allocate_exact_size(
+                            egui::vec2(search_width, 36.0),
+                            egui::Sense::hover(),
                         );
-                        if self.focus_search {
+                        let search_box = ui
+                            .interact(
+                                search_rect,
+                                egui::Id::new("home-search-box"),
+                                egui::Sense::click(),
+                            )
+                            .on_hover_cursor(egui::CursorIcon::Text);
+                        let row_height = ui.text_style_height(&egui::TextStyle::Body);
+                        let input_rect = egui::Rect::from_center_size(
+                            search_rect.center(),
+                            egui::vec2(search_rect.width() - 20.0, row_height),
+                        );
+                        let mut search_ui = ui.new_child(
+                            egui::UiBuilder::new()
+                                .max_rect(input_rect)
+                                .layout(egui::Layout::left_to_right(egui::Align::Center)),
+                        );
+                        let search_bg = ui.painter().add(egui::Shape::Noop);
+                        let search = search_ui.add(
+                            egui::TextEdit::singleline(&mut self.search)
+                                .id(egui::Id::new("home-search-input"))
+                                .hint_text("搜索最近文件")
+                                .frame(egui::Frame::NONE)
+                                .margin(egui::Margin::ZERO)
+                                .vertical_align(egui::Align::Center)
+                                .desired_width(search_rect.width() - 20.0),
+                        );
+                        let stroke_color = if search.has_focus() {
+                            colors.muted
+                        } else {
+                            colors.border
+                        };
+                        ui.painter().set(
+                            search_bg,
+                            egui::Shape::Vec(vec![
+                                egui::Shape::rect_filled(search_rect, 6.0, colors.surface),
+                                egui::Shape::rect_stroke(
+                                    search_rect,
+                                    6.0,
+                                    egui::Stroke::new(1.0, stroke_color),
+                                    egui::StrokeKind::Inside,
+                                ),
+                            ]),
+                        );
+                        if self.focus_search || search_box.clicked() {
                             search.request_focus();
                             self.focus_search = false;
                         }
@@ -851,28 +894,60 @@ fn file_modified(path: &Path) -> Option<std::time::SystemTime> {
 }
 
 fn view_button(ui: &mut egui::Ui, list: bool, selected: bool) -> egui::Response {
+    let colors = theme::home_palette();
+    let (rect, _) = ui.allocate_exact_size(egui::vec2(36.0, 36.0), egui::Sense::hover());
     let response = ui
-        .add(
-            egui::Button::new("")
-                .selected(selected)
-                .min_size(egui::vec2(32.0, 36.0)),
+        .interact(
+            rect,
+            egui::Id::new(if list {
+                "home-view-list"
+            } else {
+                "home-view-grid"
+            }),
+            egui::Sense::click(),
         )
+        .on_hover_cursor(egui::CursorIcon::PointingHand)
         .on_hover_text(if list { "列表视图" } else { "网格视图" });
-    let center = response.rect.center();
-    let color = theme::home_palette().foreground;
+    let hovered = response.hovered() || response.has_focus();
+    let fill = if selected {
+        colors.border
+    } else if hovered {
+        colors.border.gamma_multiply(0.75)
+    } else {
+        colors.surface
+    };
+    let stroke = if selected || response.has_focus() {
+        egui::Stroke::new(1.0, colors.muted.gamma_multiply(0.5))
+    } else {
+        egui::Stroke::new(1.0, colors.border)
+    };
+    ui.painter().rect_filled(rect, 6.0, fill);
+    ui.painter()
+        .rect_stroke(rect, 6.0, stroke, egui::StrokeKind::Inside);
+    let ppp = ui.ctx().pixels_per_point();
+    let center = egui::pos2(
+        (rect.center().x * ppp).round() / ppp,
+        (rect.center().y * ppp).round() / ppp,
+    );
+    let color = if selected || hovered {
+        colors.foreground
+    } else {
+        colors.muted
+    };
     if list {
         for y in [-5.0, 0.0, 5.0] {
-            ui.painter().line_segment(
-                [center + egui::vec2(-6.0, y), center + egui::vec2(6.0, y)],
-                egui::Stroke::new(1.2, color),
+            ui.painter().rect_filled(
+                egui::Rect::from_center_size(center + egui::vec2(0.0, y), egui::vec2(14.0, 1.8)),
+                0.9,
+                color,
             );
         }
     } else {
         for x in [-4.0, 4.0] {
             for y in [-4.0, 4.0] {
                 ui.painter().rect_filled(
-                    egui::Rect::from_center_size(center + egui::vec2(x, y), egui::vec2(6.0, 6.0)),
-                    1.0,
+                    egui::Rect::from_center_size(center + egui::vec2(x, y), egui::vec2(5.6, 5.6)),
+                    1.2,
                     color,
                 );
             }
@@ -1446,5 +1521,33 @@ mod tests {
         assert!(!texts
             .iter()
             .any(|t| t.contains("记录、连接，逐步展开你的工作。")));
+
+        let search_box = ctx
+            .read_response(egui::Id::new("home-search-box"))
+            .unwrap()
+            .rect;
+        let grid_btn = ctx
+            .read_response(egui::Id::new("home-view-grid"))
+            .unwrap()
+            .rect;
+        let list_btn = ctx
+            .read_response(egui::Id::new("home-view-list"))
+            .unwrap()
+            .rect;
+        let search_input = ctx
+            .read_response(egui::Id::new("home-search-input"))
+            .unwrap()
+            .rect;
+        assert_eq!(grid_btn.size(), egui::vec2(36.0, 36.0));
+        assert_eq!(list_btn.size(), egui::vec2(36.0, 36.0));
+        assert_eq!(search_box.height(), 36.0);
+        assert_eq!(search_box.top(), grid_btn.top());
+        assert_eq!(grid_btn.top(), list_btn.top());
+        assert_eq!(search_box.bottom(), grid_btn.bottom());
+        assert_eq!(grid_btn.bottom(), list_btn.bottom());
+        assert!(
+            (search_input.center().y - search_box.center().y).abs() <= 1.0,
+            "search_input={search_input:?}, search_box={search_box:?}"
+        );
     }
 }
