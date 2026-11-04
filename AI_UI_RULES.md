@@ -91,7 +91,7 @@ Arc Browser 是空间感、侧栏层级与克制程度的参考。不要导入�
 
 本仓库统一为 Rust / Bevy + `egui` 原生画布架构与内置 Pi 引擎（`agent-engine/`）。
 
-1. 查找现有主题和组件。语义 token 优先；新颜色角色要同时定义深浅主题。共享 UI 已迁移为暖白／石墨主题；历史 Catppuccin 截图和用户内容色不覆盖新的 UI token。品牌主按钮使用独立的 `primary` / `on_primary`，不与选中、焦点强调色混用。
+1. 查找现有主题和组件。语义 token 优先；新颜色角色要同时定义深浅主题。共享 UI 采用克制素净的极简现代风（`src/theme.rs` 内置 `apply_shadcn_zinc_dark`，参考 `re_ui` 与 `shadcn/ui Zinc` 的 1px 细描边、`expansion = 0.0`、零多余发光/膨胀设计，详见 [DESIGN 的 UI 技术边界与 `egui` 极简体系](DESIGN.md#ui-技术边界与-egui-极简性冷淡风体系)）。为避免第三方 `egui` 主题库滞后锁死 `egui = 0.36.2` / `bevy_egui = 0.42.0` 版本，优先在 `src/theme.rs` 中封装自包含原语。历史 Catppuccin 截图和用户内容色不覆盖新的 UI token。品牌主按钮使用独立的 `primary` / `on_primary`，不与选中、焦点强调色混用。
 2. 复用文档命令、选择、历史、输入和错误通路。新的视觉层不能成为第二份业务状态，也不能从线型或像素位置推导授权。
 3. 所有新交互覆盖默认、悬停、键盘焦点、选中、禁用及适用的加载/失败状态；禁用原因能够获知。
 4. 保留中文 IME、文本草稿、Enter/Escape 和撤销语义；快捷键不穿透文本输入、弹窗或失焦窗口。

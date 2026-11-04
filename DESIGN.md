@@ -6,9 +6,22 @@
 
 ## 产品体验与设计边界
 
-### UI 技术边界
+### UI 技术边界与 `egui` 极简（性冷淡风）体系
 
 应用统一采用纯 Rust（`Bevy` 画布 + `bevy_egui` / `egui` 原生界面）架构，不引入 React、Tauri 或 WebView 前端层。画布及 Pi 终端网格由 Bevy 绘制，首页、菜单、面板、弹窗、设置、节点控件和文字编辑等界面由 `egui` 承担；图标使用 Tabler Icons。Rust 为唯一业务状态来源。实施与焦点、坐标、跨平台验收见 [TODO](TODO.md) P0 和 [MVP](MVP.md)。
+
+为保持克制、素净的“性冷淡 / 极简现代风”（对齐 shadcn/ui Zinc、Linear、Vercel、Rerun 质感），`egui` 界面遵循以下生态参考与工程选型约定：
+
+| 类别 | 代表库 / 方案 | 风格特征与在 Ravomi 中的定位 |
+| --- | --- | --- |
+| **内建主题与原语（当前主方案）** | `src/theme.rs`（`apply_shadcn_zinc_dark` 及原语封装） | 对齐 shadcn/ui Zinc 暗色色阶（`#09090B` / `#18181B` / `#27272A`）、1px 细描边、`expansion = 0.0`、无冗余发光阴影；零外部版本耦合，直接随当前 `egui = 0.36.2` / `bevy_egui = 0.42.0` 演进 |
+| **工业级极简设计系统参考** | `re_ui`（Rerun 官方 UI 库） | `egui` 生态视觉上限最高的极简暗色参考：紧凑留白、高对比排版、1px 分隔线、无多余装饰；作为面板、检查器与列表密度的设计标尺 |
+| **现代布局与动效扩展参考** | `hello_egui`（`egui_taffy` / `egui_flex` / `egui_inbox`） | 提供 Flexbox / CSS Grid 布局与流式过渡；按需参考其布局模式，仅在与锁定 `egui` 版本兼容时评估引入 |
+| **色板预设参考** | `egui-aesthetix`、`catppuccin-egui` | 低饱和冷色调与柔和灰阶 `egui::Style` 预设参考；不直接覆盖 Ravomi 既定 Zinc / 语义 token |
+| **工作区容器与实用组件** | `egui_tiles`、`egui_extras`、`egui-modal`、`egui-command-palette`、`egui-notify` | 极简分栏/标签页停靠、表格/条带布局、`Cmd+K` 命令面板与轻量 Toast 的参考或按需选型来源 |
+| **极简线性图标** | [Tabler Icons](https://github.com/tabler/tabler-icons)（及 `egui-tabler-icons` / `egui_phosphor` 参考） | 24×24 网格、2px 统一线性描边，配合语义前景色保持冷峻克制的视觉重量 |
+
+**选型原则**：社区第三方 `egui` 扩展常滞后于最新 `egui` / `bevy_egui` 版本。Ravomi 优先在 `src/theme.rs` 内维护自包含的 Zinc 极简 Token 与轻量原语（Ghost Button、Badge、Segmented Control、Command Input、1px Card Frame），参考 `re_ui` 与 `shadcn/ui` 的视觉规范，不因第三方主题库锁死主渲染升级。
 
 ### 通用界面图标（2026-10-12）
 
