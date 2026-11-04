@@ -33,7 +33,7 @@ Arcraven · 可见、可连接、可干预的多 Agent 工作空间
 - **可连接**：让任务、代码与素材成为可复用模块，明确它们之间的关联、依赖和上下文来源。
 - **可干预**：调整分工、修订计划、请求停止或审阅成果，同时保留其他独立分支的工作空间。
 
-> **当前阶段：原生画布已接入 Pi 代码协作 MVP。** 在“画布协作”中配置模型，选中文本/分组按 Space 即可规划并执行；文字任务无需外部代码文件夹，运行记录随 `.mio` 保存。外部源码为可选附件。就绪 Agent 无固定并发或任务数量上限，以折叠节点显示名字、状态和运行记录。框选 Agent 可总结工作流、编辑草稿并保存项目内 Skill。一层动态委派已实现并通过离线回归，真实模型验收待有效凭据，见 [子 Agent 验证](validation/subagent-delegation.md)。[Tauri 入口](app/README.md) 保留为独立原型；图像工作流和 Skill 自动复用仍待实现。验证范围见 [画布协作验收](validation/canvas-ai-workflows.md)。
+> **当前阶段：原生画布已接入 Pi 代码协作 MVP。** 在“画布协作”中配置模型，选中文本/分组按 Space 即可规划并执行；文字任务无需外部代码文件夹，运行记录随 `.mio` 保存。外部源码为可选附件。就绪 Agent 无固定并发或任务数量上限，以折叠节点显示名字、状态和运行记录。框选 Agent 可总结工作流、编辑草稿并保存项目内 Skill。一层动态委派已实现并通过离线回归，真实模型验收待有效凭据，见 [子 Agent 验证](validation/subagent-delegation.md)。图像工作流和 Skill 自动复用仍待实现。验证范围见 [画布协作验收](validation/canvas-ai-workflows.md)。
 
 ## 界面预览
 
@@ -63,13 +63,12 @@ Arcraven · 可见、可连接、可干预的多 Agent 工作空间
 
 ## 当前进展
 
-仓库包含三个共享 Rust 文档基础的实现入口：
+仓库采用统一的原生 Rust（`Bevy` + `egui`）无限画布架构与内置 Pi 引擎：
 
-| 入口 | 当前可用 | 正在补齐 |
+| 模块 | 当前可用 | 正在补齐 |
 | --- | --- | --- |
-| **Rust / Bevy 画布** | 文字节点、连线、嵌套分组、图片导入、搜索、缩放平移、撤销重做、`.mio` 保存与恢复副本、PNG 导出 | 新 UI 规范、日常编辑细节与跨平台验证 |
-| **React / Tauri 原型** | 对象列表、文字编辑、新建、打开、保存、撤销重做；复用 Rust 文档核心 | 空间画布与完整交互迁移；浏览器入口仅作界面预览 |
-| **Bevy 内嵌 React 输入** | 通过 Wry 子 WebView 在原生画布中编辑节点文字 | 独立实验入口，已有 Linux X11 / XWayland 验证 |
+| **Rust / Bevy + egui 画布** | 文字节点、连线、嵌套分组、图片导入、搜索、缩放平移、撤销重做、`.mio` 保存与恢复副本、PNG 导出 | 可交互 Pi 终端节点、日常编辑细节与跨平台验证 |
+| **内置 Pi 引擎（`agent-engine/`）** | Space 规划与执行、折叠 Agent 卡片、一层动态子 Agent 委派与项目内 Skill 提炼 | 图像工作流、Skill 自动复用与真实模型验收 |
 
 Linux 已有编辑与渲染验证记录；Apple Silicon macOS 完成过原生启动及 DMG 打包的有限验证，见 [macOS 说明](packaging/macos/README.md)。Windows 和移动端尚无完整运行验收。格式兼容范围与已知问题见 [验证记录](VALIDATION.md)。
 
@@ -117,37 +116,14 @@ Linux 默认字体路径为 `/usr/share/fonts/google-noto-sans-cjk-fonts/NotoSan
 
 以上为默认桌面操作；触控板、macOS 修饰键及输入焦点规则见 [开发指南](DEVELOPMENT.md)。保存写入原文件，恢复副本作为独立文件保留。
 
-<details>
-<summary><strong>开发者入口：React / Tauri 与内嵌 React 输入</strong></summary>
-
-React / Tauri 原型需要 Node.js 24、npm、Rust 与平台构建依赖。在仓库根目录执行：
-
-```sh
-cd app
-npm ci
-npm run tauri dev
-```
-
-`npm run dev` 仅预览浏览器界面，文档操作禁用。Tauri 原型目前提供对象列表与文字编辑，尚未承载完整空间画布。
-
-在完成 `app` 依赖安装后，可从仓库根目录使用独立入口体验 Bevy 内嵌 React 文字编辑：
-
-```sh
-./app/run-canvas.sh
-```
-
-Linux 内嵌入口需要 GTK 3、WebKitGTK 4.1 与 X11 / XWayland。完整环境要求、入口区别与验证命令见 [app/README](app/README.md)。
-
-</details>
-
 ## 路线图
 
 | 阶段 | 重点 | 状态 |
 | --- | --- | --- |
 | 画布基础 | 本地文档、模块连接、编辑、保存与导出 | 已有原型，持续完善 |
-| 日常工作空间 | 新界面、画布迁移、输入与缩放、恢复及平台验收 | 进行中 |
-| 单任务执行 | 选定输入、调用执行器、接收成果、重试与重新打开 | React/Tauri 代码 MVP |
-| 多 Agent 协作 | TODO 编排、并行分支、子代理、版本交接与人工审阅 | React/Tauri 代码 MVP；完整空间协作待实现 |
+| 日常工作空间 | 原生 Bevy + egui 界面、输入与缩放、恢复及平台验收 | 进行中 |
+| 单任务执行 | 选定输入、调用执行器、接收成果、重试与重新打开 | 原生画布代码 MVP |
+| 多 Agent 协作 | TODO 编排、并行分支、子代理、版本交接与人工审阅 | 原生画布代码 MVP；可交互终端节点推进中 |
 | 模块复用与扩展 | 多执行器协作、组合模块，以及研究、编码和视觉工作流 | 规划 |
 
 核心协作闭环从“一份目标、两条并行分支、一次子代理委派、一个版本汇合、一次人工审阅”开始。具体范围、依赖与验收标准见 [PRD](PRD.md)。
@@ -164,12 +140,12 @@ Linux 内嵌入口需要 GTK 3、WebKitGTK 4.1 与 X11 / XWayland。完整环境
 | [验证记录](VALIDATION.md) | 已执行检查、运行环境与已知限制 |
 
 ```text
-src/          Rust 文档核心、历史与恢复、Bevy 画布
-app/          React / Tauri 原型与内嵌文字输入
-assets/       品牌、图标与字体资源
-packaging/    平台打包与集成
-validation/   验证记录与截图
-vendor/       保留来源与修改记录的依赖
+src/           Rust 文档核心、历史与恢复、Bevy + egui 画布
+agent-engine/  编译内置的 Pi Agent 引擎
+assets/        品牌、图标与字体资源
+packaging/     平台打包与集成
+validation/    验证记录与截图
+vendor/        保留来源与修改记录的依赖
 ```
 
 ## 参与开发

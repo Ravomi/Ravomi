@@ -2,9 +2,9 @@
 
 > 2026-10-12 首发范围调整：以 [MVP：Pi 终端节点画布](MVP.md) 为当前交付依据。仅接入内置 Pi，以可交互终端节点、真实母子派生关系、Assets 和 OSC 7501 状态显示为核心。本文其余完整产品范围保留为后续路线，已有实现记录不代表新 MVP 已完成。
 
-版本：0.9 · 更新：2026-10-12 · 公司：Arcraven · 产品：Ravomi · 当前阶段：Bevy 与 React/Tauri 已有代码协作 MVP；节点对话检查点、任意历史分叉与跨机恢复待实现。
+版本：0.9 · 更新：2026-10-12 · 公司：Arcraven · 产品：Ravomi · 当前阶段：原生 Bevy + `egui` 画布已有代码协作 MVP；节点对话检查点、任意历史分叉与跨机恢复待实现。
 
-本文件定义 Ravomi 要解决的问题、产品行为、交付范围与验收标准。[README](README.md) 面向使用者和贡献者；[DESIGN.md](DESIGN.md) 规定 UI/UX；[AI_UI_RULES.md](AI_UI_RULES.md) 将设计要求转换为 AI 实施与检查规则；[品牌规范](assets/branding/BRAND.md) 规定识别系统；[开发指南](DEVELOPMENT.md) 记录实现；[AI_DESIGN.md](AI_DESIGN.md) 保留运行状态机、数据和接口契约。当前仓库已有 `app/` React/Tauri 迁移入口；AI_DESIGN 中尚未落地的历史路径和接口不能据此视为已实现。历史方案中的 Graplu 指本项目前身，来源以 [迁移说明](MIGRATION.md) 为准。
+本文件定义 Ravomi 要解决的问题、产品行为、交付范围与验收标准。[README](README.md) 面向使用者和贡献者；[DESIGN.md](DESIGN.md) 规定 UI/UX；[AI_UI_RULES.md](AI_UI_RULES.md) 将设计要求转换为 AI 实施与检查规则；[品牌规范](assets/branding/BRAND.md) 规定识别系统；[开发指南](DEVELOPMENT.md) 记录实现；[AI_DESIGN.md](AI_DESIGN.md) 保留运行状态机、数据和接口契约。AI_DESIGN 中尚未落地的历史路径和接口不能据此视为已实现。历史方案中的 Graplu 指本项目前身，来源以 [迁移说明](MIGRATION.md) 为准。
 
 文本、图像、视频、代码和文件是同一工作流中的输入与成果；代码模块、资源模块、Agent 与子 Agent 在无限画布上共同组织。AI_DESIGN.md 保留领域契约与 G/V 需求编号，视觉需求的阶段优先级不覆盖通用协作的首发顺序；产品范围与依赖以本文为准。
 
@@ -90,7 +90,7 @@ AI 按任务领取必要上下文并交接成果，减少单个 Agent 长期携�
 
 ## 2. 当前可用功能
 
-以下 C/B 表默认描述根目录 Rust/Bevy 原型。`app/` 是另一个尚未功能对等的 React/Tauri 迁移入口，已接通新建、打开、文字对象编辑、历史与保存；当前主要显示对象列表，不能将 Bevy 的画布、图片、连线、恢复和导出能力一并算作 React 入口已实现。同窗口 React 原位文字编辑另有实验入口，范围见 [app/README.md](app/README.md) 与 [验收记录](validation/react-inline-editor.md)。
+以下 C/B 表描述根目录 Rust/Bevy + `egui` 原生画布实现。
 
 | 编号 | 功能 | 状态与边界 | 实现 / 验证依据 |
 | --- | --- | --- | --- |
@@ -364,17 +364,16 @@ flowchart TD
 
 | 层次 | 当前实现 | 后续原则 |
 | --- | --- | --- |
-| React/Tauri 迁移入口 | `app/` 使用 React + TypeScript / Tauri 2，复用 `src/session.rs` 文档命令；已有 Linux 原生对象编辑与文件往返验证 | 先迁移并验证实际桌面能力；Windows/macOS、移动端与浏览器各自验收后再声明支持；浏览器需 WASM/服务端及存储适配，不能直接调用 Tauri |
-| Bevy 桌面画布 | Rust、Bevy 0.19.1；世界文字使用本地维护的 Kayak MSDF；egui 和可选 React 输入层是现有实现 | 当前 MVP 保留 Bevy 画布，全部应用 UI 使用 React + shadcn/ui、Tabler Icons，移除 egui；按 TODO P0 验收完整宿主、输入和坐标整合，不以对象列表替代画布 |
+| Bevy 桌面画布 | Rust、Bevy 0.19.1；世界文字使用本地维护的 Kayak MSDF；应用界面统一采用 `bevy_egui` / `egui` | 保持纯 Rust（Bevy 画布 + `egui` 原生界面）架构，通用图标统一 Tabler Icons；按 TODO P0 验收完整宿主、输入和坐标整合 |
 | 文档 | 仅支持 `.mio` 项目，以 SQLite 保存画布、资产与明确选定的只读协作历史；兼容旧 ZIP MIO，不再支持 `.prg`，见 [存储规范](STORAGE.md) | 画布撤销栈不等于持久化运行历史，归档不自动执行 |
 | 输入与物理 | Winit 设备事件、Avian 固定步、Lyon 路径 | 优先复用现有库；维护指针锚点、输入所有权、整组选中与事务一致性 |
-| AI 与运行存储 | `src/collaboration/` 调度与版本化 JSON；Pi Agent Core / Pi AI 1.0.4 编译内置，代码提案与显式测试入口；Tauri 已支持明确附加流程归档 | SQLite 事务、对话检查点、完整审阅历史及实例隔离待实现；来源与导出契约见 STORAGE |
+| AI 与运行存储 | `src/collaboration/` 调度与版本化 JSON；Pi Agent Core / Pi AI 1.0.4 编译内置（`agent-engine/`），代码提案与显式测试入口 | SQLite 事务、对话检查点、完整审阅历史及实例隔离待实现；来源与导出契约见 STORAGE |
 | 对话应用接入 | 尚未接入 | 分离应用会话、任务、运行与工件身份；每个适配器提供能力矩阵、连接恢复和实际接口验证记录 |
 | 模块与委派关系 | 计划内任务及一层动态子 Agent、独立会话、固定成果交接与折叠组投影；真实模型委派验收待有效凭据 | 递归委派、追加指令与通用模块映射后续实现，画布布局不改写领域身份与执行状态 |
 | 上下文与缓存 | 固定选定源码与上游代码版本；缓存尚未接入 | 可失效缓存提示与项目数据分开存储，接入方未知指标保留未知 |
-| 导出 | Bevy 已有面向用户的 PNG 全图/选区入口及隔离 X11 验收，另有调试截图；React 入口未迁移 | 固定边界、版本、尺寸和字体；按格式、入口及平台分别验收，不用调试截图替代用户流程 |
+| 导出 | Bevy 已有面向用户的 PNG 全图/选区入口及隔离 X11 验收，另有调试截图 | 固定边界、版本、尺寸和字体；按格式、入口及平台分别验收，不用调试截图替代用户流程 |
 
-上游模块可用于理解历史行为和领域契约，不能直接当作本仓库已有能力。React/Tauri 已接入代码协作，当前待做的是全 React UI 与 Bevy 空间画布的同窗口集成，画布和 Agent 空间连线继续由 Bevy 承担。AI_DESIGN.md 中的 TypeScript 接口是完整契约草案；仅采用编译内置 Pi，Fabric.js、Konva 和缓存后端等旧候选不表示已采用。既有代码协作范围见 [代码 MVP 验证](validation/code-collaboration-mvp.md)，新终端节点范围以 [MVP](MVP.md) 为准；本轮不做图像生成功能。
+上游模块可用于理解历史行为和领域契约，不能直接当作本仓库已有能力。原生 Bevy + `egui` 画布已接入代码协作，画布和 Agent 空间连线继续由 Bevy 承担。AI_DESIGN.md 中的 TypeScript 接口是完整契约草案；仅采用编译内置 Pi，Fabric.js、Konva 和缓存后端等旧候选不表示已采用。既有代码协作范围见 [代码 MVP 验证](validation/code-collaboration-mvp.md)，新终端节点范围以 [MVP](MVP.md) 为准；本轮不做图像生成功能。
 
 不同字体引擎不保证逐像素一致。缺字、缺失素材、不支持的文件格式或对象、保存失败应通过界面说明；不能静默丢弃后显示成功。基础绘图无需模型连接，未来外部调用须显式展示数据去向，凭据不进入项目导出包。
 

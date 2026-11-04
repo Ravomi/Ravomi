@@ -7,14 +7,14 @@ if [[ $# -ge 2 ]]; then
     agent="$2"
 else
     host_triple="$(rustc -vV | sed -n 's/^host: //p')"
-    agent="$project_dir/app/src-tauri/binaries/ravomi-agent-$host_triple"
+    agent="$project_dir/agent-engine/binaries/ravomi-agent-$host_triple"
 fi
 data_dir="${XDG_DATA_HOME:-$HOME/.local/share}"
 bin_dir="$HOME/.local/bin"
 
 test -x "$binary"
 if [[ ! -x "$agent" ]]; then
-    printf 'Missing bundled Pi engine: %s\nBuild it with: cd app && npm run build:agent\n' "$agent" >&2
+    printf 'Missing bundled Pi engine: %s\nBuild it with: cd agent-engine && npm ci --ignore-scripts && npm run build\n' "$agent" >&2
     exit 1
 fi
 command -v desktop-file-install >/dev/null
@@ -23,8 +23,8 @@ mkdir -p "$bin_dir" "$data_dir/applications"
 install -m 755 "$agent" "$bin_dir/ravomi-agent.new"
 mv -f "$bin_dir/ravomi-agent.new" "$bin_dir/ravomi-agent"
 mkdir -p "$data_dir/ravomi/engine"
-install -m 644 "$project_dir/app/src-tauri/binaries/THIRD-PARTY-NOTICES.txt" \
-    "$project_dir/app/src-tauri/binaries/engine-lock.json" "$data_dir/ravomi/engine/"
+install -m 644 "$project_dir/agent-engine/binaries/THIRD-PARTY-NOTICES.txt" \
+    "$project_dir/agent-engine/binaries/engine-lock.json" "$data_dir/ravomi/engine/"
 install -m 755 "$binary" "$bin_dir/graplu.new"
 mv -f "$bin_dir/graplu.new" "$bin_dir/graplu"
 for size in 32 128 256 512; do

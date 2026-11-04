@@ -33,7 +33,7 @@ Ravomi is designed around three qualities:
 - **Connected**: Make tasks, code, and assets reusable modules with clear relationships, dependencies, and context sources.
 - **Controllable**: Change assignments, revise plans, request a stop, or review results while keeping room to work on other independent branches.
 
-> **Current stage: a native canvas with an embedded Pi code collaboration MVP.** Select text/group blocks and press Space to plan and execute tasks; each planned Agent gets a collapsible canvas node with run records. Canvas text tasks require no external code folder, and their records are included when saving `.mio`. Configure the model and optional source attachments in “画布协作”. Ready Agents run without a fixed concurrency or task-count cap. Select Agent nodes to summarize fixed runs into an editable, project-local Skill. One-level dynamic delegation is implemented with local regression coverage; remote model acceptance is pending a working credential. See [subagent validation](validation/subagent-delegation.md). Image workflows and automatic Skill reuse remain planned. The [React/Tauri entry](app/README.md) is a separate prototype, not the full canvas. See [canvas workflow validation](validation/canvas-ai-workflows.md) for tested scope.
+> **Current stage: a native canvas with an embedded Pi code collaboration MVP.** Select text/group blocks and press Space to plan and execute tasks; each planned Agent gets a collapsible canvas node with run records. Canvas text tasks require no external code folder, and their records are included when saving `.mio`. Configure the model and optional source attachments in “画布协作”. Ready Agents run without a fixed concurrency or task-count cap. Select Agent nodes to summarize fixed runs into an editable, project-local Skill. One-level dynamic delegation is implemented with local regression coverage; remote model acceptance is pending a working credential. See [subagent validation](validation/subagent-delegation.md). Image workflows and automatic Skill reuse remain planned. See [canvas workflow validation](validation/canvas-ai-workflows.md) for tested scope.
 
 <a id="界面预览"></a>
 
@@ -69,13 +69,12 @@ The canvas shows relationships; task scope and selected inputs determine what ac
 
 ## Current progress
 
-The repository contains three entry points built on a shared Rust document foundation:
+The repository provides a unified native Rust (`Bevy` + `egui`) infinite-canvas workspace and bundled Pi agent engine:
 
-| Entry point | Available today | Work remaining |
+| Module | Available today | Work remaining |
 | --- | --- | --- |
-| **Rust / Bevy canvas** | Text nodes, connections, nested groups, image import, search, zoom and pan, undo and redo, `.mio` saving and recovery copies, PNG export | New UI specification, everyday editing refinements, and cross-platform validation |
-| **React / Tauri prototype** | Object list, text editing, new/open/save, undo and redo; reuses the Rust document core | Spatial canvas and full interaction migration; the browser entry point is a UI preview only |
-| **React input embedded in Bevy** | Node text editing in the native canvas through a Wry child WebView | A separate experimental entry point, with Linux X11 / XWayland validation recorded |
+| **Rust / Bevy + egui canvas** | Text nodes, connections, nested groups, image import, search, zoom and pan, undo and redo, `.mio` saving and recovery copies, PNG export | Interactive Pi terminal nodes, everyday editing refinements, and cross-platform validation |
+| **Bundled Pi engine (`agent-engine/`)** | Space-triggered planning and execution, collapsible Agent cards, one-level dynamic subagent delegation, and project-local Skill drafting | Image workflows, automatic Skill reuse, and remote model acceptance |
 
 Editing and rendering have been validated on Linux. Native startup and DMG packaging have received limited validation on Apple Silicon macOS; see the [macOS notes](packaging/macos/README.md). Windows and mobile platforms have not completed full runtime validation. See the [validation records](VALIDATION.md) for format compatibility and known issues.
 
@@ -131,29 +130,6 @@ On Linux, the default font path is `/usr/share/fonts/google-noto-sans-cjk-fonts/
 
 These are the default desktop controls. See the [development guide](DEVELOPMENT.md) for trackpad behavior, macOS modifier keys, and input focus rules. Saving writes to the original file; recovery copies remain separate files.
 
-<details>
-<summary><strong>Developer entry points: React / Tauri and embedded React input</strong></summary>
-
-The React / Tauri prototype requires Node.js 24, npm, Rust, and platform build dependencies. From the repository root, run:
-
-```sh
-cd app
-npm ci
-npm run tauri dev
-```
-
-`npm run dev` previews the browser UI only, with document operations disabled. The Tauri prototype currently offers an object list and text editing; it does not yet provide the full spatial canvas.
-
-After installing the `app` dependencies, you can try React text editing embedded in Bevy through a separate entry point. Run this from the repository root:
-
-```sh
-./app/run-canvas.sh
-```
-
-On Linux, the embedded entry point requires GTK 3, WebKitGTK 4.1, and X11 / XWayland. See [app/README](app/README.md) for full environment requirements, differences between entry points, and validation commands.
-
-</details>
-
 <a id="路线图"></a>
 
 ## Roadmap
@@ -161,9 +137,9 @@ On Linux, the embedded entry point requires GTK 3, WebKitGTK 4.1, and X11 / XWay
 | Stage | Focus | Status |
 | --- | --- | --- |
 | Canvas foundation | Local documents, module connections, editing, saving, and export | Prototype available; being refined |
-| Everyday workspace | New UI, canvas migration, input and zoom, recovery, and platform validation | In progress |
-| Single-task execution | Selected inputs, executor calls, results, retries, and reopening tasks | Code MVP in React/Tauri |
-| Multi-agent collaboration | TODO orchestration, parallel branches, subagents, versioned handoffs, and human review | Code MVP; spatial integration pending |
+| Everyday workspace | Native Bevy + egui UI, input and zoom, recovery, and platform validation | In progress |
+| Single-task execution | Selected inputs, executor calls, results, retries, and reopening tasks | Native canvas code MVP |
+| Multi-agent collaboration | TODO orchestration, parallel branches, subagents, versioned handoffs, and human review | Native canvas code MVP; interactive terminal nodes in progress |
 | Reusable modules and extensions | Multiple executors, composed modules, and research, coding, and visual workflows | Planned |
 
 The first complete collaboration workflow starts with one goal, two parallel branches, one subagent delegation, one merge of versioned results, and one human review. See the [PRD](PRD.md) for scope, dependencies, and acceptance criteria.
@@ -182,12 +158,12 @@ The first complete collaboration workflow starts with one goal, two parallel bra
 | [Validation records](VALIDATION.md) | Completed checks, environments, and known limitations |
 
 ```text
-src/          Rust document core, history and recovery, Bevy canvas
-app/          React / Tauri prototype and embedded text input
-assets/       Brand assets, icons, and fonts
-packaging/    Platform packaging and integration
-validation/   Validation records and screenshots
-vendor/       Dependencies with preserved source and change records
+src/           Rust document core, history and recovery, Bevy + egui canvas
+agent-engine/  Bundled Pi agent engine
+assets/        Brand assets, icons, and fonts
+packaging/     Platform packaging and integration
+validation/    Validation records and screenshots
+vendor/        Dependencies with preserved source and change records
 ```
 
 Most development and design documents are currently written in Chinese. The [Chinese README](README-ZH.md) covers the same product overview and setup instructions.

@@ -19,10 +19,10 @@
 - DeepSeek 真实冒烟已尝试；现有本机凭据返回 HTTP 401，未进入工具调用阶段，**未通过远端验收**。未读取用户工程，未将凭据保存到仓库。可在本机修复凭据后运行下方命令。
 
 ```sh
-cd app/agent-engine
+cd agent-engine
 npm run build
 npm test
-cd ../..
+cd ..
 cargo test --release --lib --locked --no-default-features real_pi_dynamic_delegation -- --ignored --nocapture
 ```
 

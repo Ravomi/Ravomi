@@ -7,7 +7,6 @@ license = "GPL-3.0-only"
 
 [features]
 default = ["viewer"]
-react-editor = ["viewer", "dep:wry", "dep:gtk", "dep:x11-dl"]
 msdf = ["dep:kayak_font_msdf", "dep:parley"]
 viewer = ["dep:bevy", "dep:resvg", "dep:image", "dep:bevy_egui", "dep:egui", "dep:rfd", "dep:avian2d", "dep:raw-window-handle", "dep:lyon_tessellation", "dep:winit", "dep:arboard", "dep:ratex-parser", "dep:ratex-layout", "dep:ratex-types", "dep:ratex-katex-fonts", "msdf"]
 
@@ -40,14 +39,9 @@ ratex-layout = { version = "=0.1.14", optional = true }
 ratex-types = { version = "=0.1.14", optional = true }
 ratex-katex-fonts = { version = "=0.1.14", optional = true }
 ttf-parser = "=0.25.1"
-wry = { version = "=0.57.0", optional = true }
-
-[target.'cfg(target_os = "linux")'.dependencies]
-gtk = { version = "=0.18.2", optional = true }
-x11-dl = { version = "=2.21.0", optional = true }
 
 [workspace]
-members = ["vendor/kayak_font_msdf", "app/src-tauri"]
+members = ["vendor/kayak_font_msdf"]
 default-members = ["."]
 exclude = ["vendor/winit"]
 

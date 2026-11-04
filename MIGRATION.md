@@ -6,7 +6,7 @@ Ravomi 是 Arcraven 的多 Agent 画布产品，产品定义与阶段状态以 [
 
 产品已于 2026-10-11 从 H&M（Huginn & Muninn）更名为 Ravomi。公开产品仓库为 [Ravomi/ravomi-app](https://github.com/Ravomi/ravomi-app)，此前开发仓库为 `Wang-Yang-source/H-M`。首次公开发布使用已提交内容的完整快照，本地未提交的开发改动不纳入该快照；原有开发分支与历史保留在原工作区。crate、程序内部标识、用户数据目录与 `.prg` 格式继续兼容。
 
-仓库现在同时包含 Rust/Bevy 原生画布基线、实际存在的 React/Tauri 迁移入口，以及 Wry/React 同窗口文字输入适配。各自的命令、能力和平台验证边界见 [开发指南](DEVELOPMENT.md) 与 [app/README.md](app/README.md)。React/Tauri 尚未替代完整 Bevy 画布；AI 执行、Agent 编排与上下文交接仍属产品规划。规范中的团子猫、素净工作区和多 Agent 工作流不会因文档更新自动成为已实现能力。
+仓库现已收敛为统一的 Rust / Bevy + `egui` 原生画布架构，并配合成品内置的 Pi 引擎（`agent-engine/`）；早期实验性的 React/Tauri 原型及 Wry 同窗口文字输入层已移除。命令、能力和平台验证边界见 [开发指南](DEVELOPMENT.md) 与 [agent-engine/README.md](agent-engine/README.md)。规范中的团子猫、素净工作区和多 Agent 工作流按实际源码与验证记录区分已实现与待实现范围。
 
 ## 2026-10-09：Bevy 原型迁入 Graplu
 

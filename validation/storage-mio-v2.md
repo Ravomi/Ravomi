@@ -16,7 +16,7 @@
 | Tauri 归档 | 保留显式“保存到当前项目”和独立只读查看；异步操作校验 `projectId` 与本次打开令牌，普通保存不打包全部活动流程 |
 | Linux 缩略图 | 兼容 v1/v2 已知版本与功能；只读画布/图片，不解析协作历史，也不承担编辑器的完整包校验 |
 
-实现依据：[project.rs](../src/project.rs)、[project_package.rs](../src/project_package.rs)、[project_history.rs](../src/project_history.rs)、[document.rs](../src/document.rs)、[画布协作](../src/canvas_ai.rs)、[绑定同步](../src/collaboration/canvas.rs) 与 [Tauri 归档命令](../app/src-tauri/src/collaboration.rs)。
+实现依据：[project.rs](../src/project.rs)、[project_package.rs](../src/project_package.rs)、[project_history.rs](../src/project_history.rs)、[document.rs](../src/document.rs)、[画布协作](../src/canvas_ai.rs) 与 [绑定同步](../src/collaboration/canvas.rs)（原 Tauri 归档命令 `app/src-tauri/src/collaboration.rs` 已随原型移除）。
 
 打开 v1 不写磁盘；下一次明确保存 `.mio` 才生成 v2。另存保留旧原件，在原路径保存会在验证成功后替换。旧字段、资产和受支持的不透明扩展继续保留；扩展占用新格式保留路径时拒绝覆盖。`objects/sha256/` 是当前历史与绑定引用的封闭集合，不接收孤立对象；扩展自己的字节应保存在 `extensions/`。
 

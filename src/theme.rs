@@ -395,8 +395,7 @@ pub fn apply_shadcn_zinc_dark(ctx: &egui::Context) {
 
     visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(63, 63, 70); // zinc-700
     visuals.widgets.hovered.weak_bg_fill = egui::Color32::from_rgb(63, 63, 70);
-    visuals.widgets.hovered.bg_stroke =
-        egui::Stroke::new(1.0, egui::Color32::from_rgb(82, 82, 91));
+    visuals.widgets.hovered.bg_stroke = egui::Stroke::new(1.0, egui::Color32::from_rgb(82, 82, 91));
     visuals.widgets.hovered.fg_stroke = egui::Stroke::new(1.0, fg_primary);
     visuals.widgets.hovered.corner_radius = radius_md;
     visuals.widgets.hovered.expansion = 0.0;

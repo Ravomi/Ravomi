@@ -6,19 +6,17 @@ Ravomi 是 Arcraven 的多 Agent 画布工作空间。产品目标是在无限�
 
 ## 工程入口与实现状态
 
-全平台应用的迁移入口已经位于 `app/`（React + Tauri + Rust），运行与验证见 [app/README.md](app/README.md)；“全平台”是目标，并非各平台均已验收。下面的 Bevy 说明仍适用于已实现的原生画布基线；`./run.sh` 保持启动该基线。新 Tauri crate 通过 `default-features = false` 复用 Rust 文档库，不在新窗口中加载 Bevy。
-
-同窗口 React 文字编辑使用独立入口 `./app/run-canvas.sh 文件.mio`：原生 Bevy 画布通过 Wry 子 WebView 承载输入层，Linux 目前要求 X11/XWayland。先执行 `cd app && npm ci`。手动构建 `--features react-editor` 前必须运行 `npm run build:canvas-editor`，生成的 bundle 不入库。详细边界和测试见 [app/README.md](app/README.md)。
+应用采用纯 Rust（`Bevy` + `bevy_egui` / `egui`）原生架构，启动入口为 `./run.sh`；内置 Pi Agent 引擎位于 `agent-engine/`，构建与验证见 [agent-engine/README.md](agent-engine/README.md)。
 
 工具浮层截图可在预览命令中追加 `--preview-tool search`、`--preview-tool properties`、`--preview-tool context` 或 `--preview-tool exit`，与 `--light`、`--ui-scale`、`--screenshot` 组合。属性与右键预览选中前四个节点，退出预览在内存中新建节点以触发未保存提示，不写入文件。这些入口仅用于复现控件布局，不替代真实输入操作验收。
 
 面向使用者的介绍见 [README](README.md)，功能状态与交付要求见 [PRD](PRD.md)。本文保留运行、交互细节、渲染、依赖与性能验证方法；历史测量的环境和限制以 [验证记录](VALIDATION.md) 为准。
 
-当前代码使用 Ravomi 名称，共享主题、原生首页及 React 工作区已落实获准风格卡的暖白／石墨方向。图标从已确认头像导出，供网页、原生窗口和 Linux/macOS 打包配置复用；各平台实际安装结果需分别验收。新设计采用低饱和侧栏和清晰工作区。石墨黑 `#202126`、局部雾蓝紫细颗粒柔光主要用于团子猫形象；小猫为一体轮廓、双耳双眼，无嘴、鼻、尾巴或脚。文字、输入框、连线和操作状态保持清晰，不对整层 UI 施加模糊、颗粒或发光。
+当前代码使用 Ravomi 名称，共享主题与原生首页已落实获准风格卡的深色石墨方向。图标从已确认头像导出，供原生窗口和 Linux/macOS 打包配置复用；各平台实际安装结果需分别验收。新设计采用低饱和侧栏和清晰工作区。石墨黑 `#202126`、局部雾蓝紫细颗粒柔光主要用于团子猫形象；小猫为一体轮廓、双耳双眼，无嘴、鼻、尾巴或脚。文字、输入框、连线和操作状态保持清晰，不对整层 UI 施加模糊、颗粒或发光。
 
-当前 Rust/Bevy 基线仍包含 egui 编辑界面，两个入口已接入内置 Pi，原生画布已有 Agent 卡片与首轮动态委派，验证边界见 [画布协作](validation/canvas-ai-workflows.md) 和 [子 Agent](validation/subagent-delegation.md)。源提交、目录对应和许可见 [迁移说明](MIGRATION.md)。
+当前 Rust/Bevy + egui 原生画布已接入内置 Pi，具备 Agent 卡片与首轮动态委派，验证边界见 [画布协作](validation/canvas-ai-workflows.md) 和 [子 Agent](validation/subagent-delegation.md)。源提交、目录对应和许可见 [迁移说明](MIGRATION.md)。
 
-目标架构按 [MVP](MVP.md) 和 [TODO](TODO.md) P0–P5：保留 Bevy 画布和 Pi 终端网格绘制，全部应用 UI 改为 React + shadcn/ui，图标统一 Tabler Icons，迁移后移除 egui / bevy_egui。Rust 负责事实数据及 Pi 执行，WebView 通过命令/订阅桥接；Alacritty 为终端内核参考，OSC 7501 用于状态报告。现有独立 Tauri 对象列表、Wry 输入层和未提交探针均不等于完整宿主集成完成。下文 egui 依赖和运行命令记录当前基线，不能据此为新界面继续选用 egui。
+目标架构按 [MVP](MVP.md) 和 [TODO](TODO.md) P0–P5：采用统一的 Bevy 无限画布 + `egui` 原生界面与 Pi 终端网格绘制，图标统一 Tabler Icons。Rust 负责事实数据及 Pi 执行；Alacritty 为终端内核参考，OSC 7501 用于状态报告。
 
 历史性能原型曾使用 Project Graph 的 PRG 教程，测量记录保留在 `validation/`。当前仅打开 `.mio` 项目，不再读取 PRG；需要教程的可选回归使用本地 `fixtures/tutorial-shortcut-keys.mio`，夹具不随仓库分发。
 
@@ -89,15 +87,6 @@ Bevy 外观已使用 Ravomi 暖白／石墨共享主题，画布背景不透明�
 
 测速窗口禁止调整大小，但桌面的 HiDPI 缩放仍可能改变物理像素尺寸。报告的 `window` 字段记录实际物理尺寸，比较前必须核对。Linux X11/XWayland 下可使用 `env -u WAYLAND_DISPLAY WINIT_X11_SCALE_FACTOR=1 ./run.sh --benchmark --output results/bevy.json --screenshot results/bevy.png` 固定为 1 倍缩放。
 
-同数据的 Canvas2D 对照：
-
-```bash
-./run.sh --export results/scene.json
-node benchmark/canvas.mjs results/scene.json results/canvas.json
-```
-
-Node >=22，默认使用 `/usr/bin/google-chrome`，可设置 `CHROME`。复用 Node 标准 HTTP/WebSocket/子进程 API 驱动独立浏览器窗口，不引入自动化依赖。两者应依次运行，使用相同文件、窗口尺寸和轨迹；可通过 `BENCHMARK_WIDTH`、`BENCHMARK_HEIGHT` 环境变量将 Canvas 尺寸与 Bevy 实际报告对齐。Canvas2D 对照重绘同一场景、预先计算换行并裁剪离屏节点。**它不是原版 React/Tauri 应用，结果不能当作完整应用重写加速比。** 字体排版、文字栅格化和部分连线视觉仍有差异。
-
 ## 当前范围
 
 支持教程中的节点位置、颜色、中文文本、分组外框、连接点、连线端点与文字。PNG/JPEG 解码复用 image，SVG 栅格化复用 resvg。未知节点/连线类型、缺失引用/附件会报错，避免静默遗漏。
@@ -160,7 +149,7 @@ Rust 标准库处理文件、CLI、集合、计时和结果写入；社区库处
 | rfd | 0.17.2 | MIT | 原生保存对话框，Linux xdg portal |
 | avian2d | 0.7.0 | MIT OR Apache-2.0 | 官方对应 Bevy 0.19；2D 碰撞、求解、查询与休眠 |
 
-不实现自制 ZIP、MessagePack、字体引擎或 SVG 解码器。Godot Variant 解码不适用于原版测试文件；Web UI 框架不承担此 Bevy 基线的画布绘制。依赖许可证/MSRV 通过 `cargo info --registry crates-io` 检查；本项目沿用 GPL-3.0-only。主要验证环境为 Linux；Bevy 的 macOS 启动与 Metal 离屏渲染已有有限证据，见 [macOS 打包说明](packaging/macos/README.md)，不代表完整交互验收。React/Tauri 与同窗口 React 编辑的跨平台状态分别见 [app/README.md](app/README.md)，不能套用 Bevy 的平台结果。
+不实现自制 ZIP、MessagePack、字体引擎或 SVG 解码器。Godot Variant 解码不适用于原版测试文件。依赖许可证/MSRV 通过 `cargo info --registry crates-io` 检查；本项目沿用 GPL-3.0-only。主要验证环境为 Linux；Bevy 的 macOS 启动与 Metal 离屏渲染已有有限证据，见 [macOS 打包说明](packaging/macos/README.md)，不代表完整交互验收。
 
 ```bash
 cargo test --locked

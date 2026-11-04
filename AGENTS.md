@@ -2,11 +2,11 @@
 
 Ravomi 是 Arcraven 的无限画布多 Agent 协作产品。核心定义：召唤并协作管理多个 Agent，将代码、素材、任务与子代理组织为可连接模块；AI 拆解 TODO、编排流程、按需交接任务和上下文；人能查看进度、介入调整，同时并行推进其他分支。核心体验为可见、可连接、可干预，并保持对项目全局的掌握。
 
-本仓库包含 `src/` Rust/Bevy 画布基线、`app/` React/Tauri 界面迁移原型，以及 Wry 内嵌 React 文字输入入口；根目录 `Cargo.toml` 是 workspace 入口。两个入口均已接入编译内置 Pi 的代码协作 MVP；原生画布支持 Space 提交、折叠 Agent 节点和选区 Skill 提炼，验证范围见 `validation/canvas-ai-workflows.md`。图像工作流、动态自主委派和 Skill 自动复用仍待实现。不能将设计概念、可视化连线或模拟测试写成真实外部调用已通过。`app/` 是实际本地目录；迁移前上游的 `app/src/core/` 等路径只在明确标记的历史资料中保留。
+本仓库采用纯 Rust（`Bevy` + `bevy_egui` / `egui`）原生架构，包含 `src/` 画布与原生界面实现及内置 Pi 引擎（`agent-engine/`）；根目录 `Cargo.toml` 是 workspace 入口。原生画布已接入编译内置 Pi 的代码协作 MVP，支持 Space 提交、折叠 Agent 节点和选区 Skill 提炼，验证范围见 `validation/canvas-ai-workflows.md`。图像工作流、动态自主委派和 Skill 自动复用仍待实现。不能将设计概念、可视化连线或模拟测试写成真实外部调用已通过。迁移前上游的历史路径只在明确标记的历史资料中保留。
 
 ## 文档与设计依据
 
-当前 MVP 必须先读 [MVP](MVP.md) 与 [TODO](TODO.md) P0–P5：保留 Bevy 画布及 Pi 终端网格绘制，全部应用 UI 使用 React + shadcn/ui，通用图标统一 Tabler Icons，迁移后移除 egui / bevy_egui；不得为新 UI 继续增加 egui 或 Bevy UI 控件。仅接入内置 Pi，Alacritty 为终端内核参考，Pi Subagent 为委派机制参考，OSC 7501 为状态协议。子节点连接真实派生的直接母节点，Assets 保留实际 Agent / Run 来源。完整 PRD 路线不扩大本轮首发范围，文档选型不代表实现完成。
+当前 MVP 必须先读 [MVP](MVP.md) 与 [TODO](TODO.md) P0–P5：采用纯 Rust（Bevy 画布 + `bevy_egui` / `egui` 原生界面）统一技术栈，保留 Bevy 画布及 Pi 终端网格绘制，应用 UI 统一使用 egui 原生界面，通用图标统一 Tabler Icons。仅接入内置 Pi，Alacritty 为终端内核参考，Pi Subagent 为委派机制参考，OSC 7501 为状态协议。子节点连接真实派生的直接母节点，Assets 保留实际 Agent / Run 来源。完整 PRD 路线不扩大本轮首发范围，文档选型不代表实现完成。
 
 当前仅使用 `https://github.com/Ravomi/ravomi-app.git`，默认分支 `main`；历史仓库地址只作来源记录，不再作为 fetch/push 目标。
 
@@ -27,7 +27,7 @@ Ravomi 是 Arcraven 的无限画布多 Agent 协作产品。核心定义：召�
 - 贡献者与上游致谢统一维护在 `CREDITS.md`，具体代码贡献沿用提交与 PR 记录，不逐函数追加个人署名。保留第三方原作者及许可证，迁移前的贡献保留来源索引。不自动添加个人头衔、邮箱或修改 Git 身份。
 - 优先标准库及已有社区库，依赖固定版本并维护 `Cargo.lock`、许可证及 vendored 修改来源。
 - 验证使用 `cargo fmt --all --check`、`cargo test --workspace --locked` 和 `cargo clippy --workspace --all-targets --locked -- -D warnings`，可选 `--release` 复用发布模式缓存。
-- React/Tauri 及内嵌输入修改同时遵循 [app 验证说明](app/README.md)。仅修改文档时检查本地链接、命令/路径、实现状态与规范一致性，不把历史测试结果记成当次重新执行；不为纯文档变更启动无关 GPU 基准。
+- 仅修改文档时检查本地链接、命令/路径、实现状态与规范一致性，不把历史测试结果记成当次重新执行；不为纯文档变更启动无关 GPU 基准。
 - GPU、系统字体及教程文件测试用 `-- --include-ignored --test-threads=1`；确认字体、fixtures 与 Vulkan 可用。桌面运行及性能测试遵循用户授权，启动器 `./run.sh` 会按需编译。不要在测量帧耗时的同时编译或运行其他负载。
 - Linux `.mio` 缩略图验证：`python3 -m unittest discover -s packaging/linux -p test_thumbnailer.py`。Python 不参与实时 Bevy 画布渲染。
 - `target/`、`results/`、`fixtures/` 不纳入版本控制；不要提交令牌、环境文件或用户文档。`validation/` 保留有说明的验证工件。

@@ -87,13 +87,13 @@ impl Pi {
             _ => return Err("此平台尚无内置 Agent 引擎构建".into()),
         };
         let development = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("app/src-tauri/binaries")
+            .join("agent-engine/binaries")
             .join(format!(
                 "ravomi-agent-{target}{}",
                 if cfg!(windows) { ".exe" } else { "" }
             ));
         if !development.is_file() {
-            return Err("缺少内置 Agent 引擎，请先在 app 运行 npm run build:agent".into());
+            return Err("缺少内置 Agent 引擎，请先在 agent-engine 运行 npm run build".into());
         }
         Ok(Self {
             executable: development,

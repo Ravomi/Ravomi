@@ -13,7 +13,7 @@ const targets = {
 };
 const target = targets[process.env.RAVOMI_AGENT_TARGET ?? `${process.platform}-${process.arch}`];
 if (!target) throw new Error('Unsupported agent engine target');
-const directory = resolve(root, '../src-tauri/binaries');
+const directory = resolve(root, 'binaries');
 mkdirSync(directory, { recursive: true });
 const version = spawnSync('bun', ['--version'], { encoding: 'utf8' });
 if (version.error) throw version.error;

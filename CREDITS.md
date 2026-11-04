@@ -8,8 +8,6 @@ Ravomi 是 Arcraven 的多 Agent 画布产品，曾用名 H&M / Huginn & Muninn�
 
 ## 社区贡献
 
-React/Tauri 迁移入口使用 React / React DOM（MIT）、Vite（MIT）、TypeScript（Apache-2.0）、Tauri 与官方 dialog 插件（MIT 或 Apache-2.0），前端验收使用 Playwright（Apache-2.0）。直接依赖固定版本，完整解析版本见 `app/package-lock.json` 和根 `Cargo.lock`；分发时保留各依赖自带版权与许可。原有 Rust 核心及 vendored 来源不变。
-
 感谢参与代码、设计、文档、翻译、测试和问题反馈的贡献者。Ravomi 后续贡献以 [提交记录](https://github.com/Ravomi/ravomi-app/commits/main/) 和 Pull Request 为依据。新仓库从完整项目快照开始，迁移前贡献仍可查阅 [Graplu 历史提交](https://github.com/graphif/Graplu/commits/main/) 和 [原仓库贡献者](https://github.com/graphif/Graplu/graphs/contributors)，不因重建历史而改变归属。
 
 Graplu 从 Project Graph 的 Bevy 原型迁入，迁移前的贡献不能仅凭本仓库的提交数量判断。原型来源、迁移基线和历史边界见 [迁移说明](MIGRATION.md)。
@@ -23,7 +21,6 @@ Graplu 从 Project Graph 的 Bevy 原型迁入，迁移前的贡献不能仅凭�
 | Project Graph 及其社区 | Bevy 原型来源、节点图交互、`.prg` 格式与教程参考 | [迁移说明](MIGRATION.md) |
 | Bevy 与 bevy_egui / egui | 应用调度、渲染、输入与界面 | [开发指南](DEVELOPMENT.md)、[依赖清单](Cargo.toml) |
 | SQLite / rusqlite | `.mio` v3 项目数据库、事务与关系索引 | rusqlite 0.40.2（MIT），libsqlite3-sys 0.38.2（MIT），内置 SQLite 3.53.2（公有领域）；[SQLite 来源](https://sqlite.org/)、[Rust 绑定](https://github.com/rusqlite/rusqlite)，未修改上游源码，锁定版本见 Cargo.lock |
-| Wry / gtk-rs / x11-dl | 同窗口 React 文字输入的原生 WebView 与 Linux GTK/X11 事件适配 | Wry 0.57.0（MIT OR Apache-2.0）、gtk 0.18.2（MIT）、x11-dl 2.21.0（MIT）；实现参考 Wry 的 wgpu 子窗口示例，依赖版本见 Cargo.lock |
 | Kayak UI / kayak_font_msdf | MSDF 字形生成器的上游实现与本地适配 | [原作者、来源及本地修改](vendor/kayak_font_msdf/UPSTREAM.md) |
 | Viktor Chlumský 的 msdfgen | MSDF 算法来源及修复参考 | [MSDF 来源说明](vendor/kayak_font_msdf/UPSTREAM.md) |
 | Winit 及其贡献者 | 桌面窗口与输入，含本地 Wayland 补丁 | [补丁来源说明](vendor/winit/UPSTREAM-PATCH.md) |
@@ -45,7 +42,7 @@ Graplu 从 Project Graph 的 Bevy 原型迁入，迁移前的贡献不能仅凭�
 
 动态子 Agent 的独立会话与等待结果机制参考 [Pi Subagent](https://github.com/badlogic/pi-subagent)（2026-10-12 查阅）。Ravomi 使用内置 Pi 和 Rust 调度独立实现，未复制该独立仓库源码，也不引入其 tmux 运行依赖；详见 [子 Agent 验证](validation/subagent-delegation.md)。
 
-代码协作 MVP 内置 [Pi Agent Core / Pi AI](https://github.com/earendil-works/pi/tree/7c10bd4337495ee613f2224843ecdf349b80d1df) 1.0.4，原作者 Mario Zechner，MIT。模块经 Bun 1.3.14 编译进入 Ravomi 的私有引擎，不依赖外部 Pi CLI。上游源码未修改；锁文件、适配边界、Bun 及 Pi 许可证与构建生成的第三方声明说明见 [内置引擎来源](app/agent-engine/README.md)。
+代码协作 MVP 内置 [Pi Agent Core / Pi AI](https://github.com/earendil-works/pi/tree/7c10bd4337495ee613f2224843ecdf349b80d1df) 1.0.4，原作者 Mario Zechner，MIT。模块经 Bun 1.3.14 编译进入 Ravomi 的私有引擎，不依赖外部 Pi CLI。上游源码未修改；锁文件、适配边界、Bun 及 Pi 许可证与构建生成的第三方声明说明见 [内置引擎来源](agent-engine/README.md)。
 
 连线预览方向与成功反馈参考 Project Graph master `1fb1b5cc77d5d5a3820cbae4f5d5777339af63a0` 的 `ControllerNodeConnection.tsx` 和 `edge/concrete/SymmetryCurveEdgeRenderer.tsx`。Graplu 复用原生曲线与效果队列，使用主题强调色，并沿实际曲线播放短暂流动。
 

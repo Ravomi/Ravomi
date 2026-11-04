@@ -10,7 +10,7 @@ MVP 只接入内置 Pi，不提供 Codex、Claude Code 或其他执行器入口�
 
 ## 2. 已指定的参考项目
 
-通用 UI 图标已确定使用 [Tabler Icons](https://github.com/tabler/tabler-icons)，默认采用 Outline 样式；React 与原生画布保持同一套图标语义，具体规则见 [AI_UI_RULES](AI_UI_RULES.md)。品牌猫继续使用既有确认资产。图标库选型不决定 UI 框架，现有图标迁移尚待实现。
+通用 UI 图标已确定使用 [Tabler Icons](https://github.com/tabler/tabler-icons)，默认采用 Outline 样式；egui 原生界面与 Bevy 画布保持同一套图标语义，具体规则见 [AI_UI_RULES](AI_UI_RULES.md)。品牌猫继续使用既有确认资产。现有图标收敛尚待完成。
 
 | 项目或规范 | 参考与复用范围 | 接入边界 |
 | --- | --- | --- |
@@ -22,11 +22,11 @@ OSC 7501 的介绍见 [A Terminal Protocol for Program Status](https://mitchellh
 
 ## 3. 第一版用户流程
 
-### 必需架构：Bevy 画布 + 全 React UI
+### 必需架构：Bevy 画布 + egui 原生界面
 
-2026-10-12 用户确认：保留 Bevy 负责无限画布、节点与连线、画布内容、选区、拖动缩放、裁剪及 Pi 终端网格绘制；所有应用 UI 使用 React + [shadcn/ui](https://ui.shadcn.com/docs)，图标统一 Tabler Icons。首页、工具栏、侧栏、菜单、弹窗、设置、Assets 面板、节点操作控件和文字编辑界面均在迁移范围内，最终移除 egui / bevy_egui。
+2026-10-12 用户确认：采用纯 Rust（Bevy 画布 + `bevy_egui` / `egui` 原生界面）统一架构。Bevy 负责无限画布、节点与连线、画布内容、选区、拖动缩放、裁剪及 Pi 终端网格绘制；首页、工具栏、侧栏、菜单、弹窗、设置、Assets 面板、节点操作控件和文字编辑界面统一使用 `egui` 原生界面，图标统一 Tabler Icons。
 
-React WebView 与 Bevy 在同一宿主窗口组合，节点覆盖控件跟随画布提供的屏幕坐标定位。具体窗口组合方式需逐平台验证，不预先宣称透明覆盖和事件穿透已可用。Rust 管理真实文档与 Pi 状态，React 经命令与状态订阅桥接；输入焦点、中文 IME、坐标缩放和裁剪需统一处理。完整待办见 [TODO 的 P0](TODO.md)。这是本轮 MVP 的必要条件，不是后续可选美化。
+`egui` 原生界面与 Bevy 画布在同一原生宿主窗口内直接组合，节点覆盖控件跟随画布提供的屏幕坐标定位，Rust 统一管理真实文档与 Pi 状态；输入焦点、中文 IME、坐标缩放和裁剪在同一进程内统一处理。完整待办见 [TODO 的 P0](TODO.md)。这是本轮 MVP 的基础架构约定。
 
 ### 操作流程
 
@@ -100,7 +100,7 @@ Pi 集成层从真实生命周期事件发出 OSC 7501；终端接收层解析�
 
 | 阶段 | 交付 | 通过条件 |
 | --- | --- | --- |
-| P0 | Bevy 画布与全 React UI | 按 TODO 的 P0.1–P0.6 完成集成、全量 UI 迁移、焦点和坐标验收，移除 egui；作为 P1–P5 的共同交付基础 |
+| P0 | Bevy 画布与 egui 原生界面统一 | 按 TODO 的 P0.1–P0.5 完成纯 Rust 原生宿主与界面收敛、统一焦点路由与高 DPI 坐标验收；作为 P1–P5 的共同交付基础 |
 | P1 | 单个可交互 Pi 终端节点 | 启动内置 Pi；真实输入与输出；中文输入、复制粘贴、滚动、尺寸变化、退出和错误路径可用 |
 | P2 | 多节点与焦点隔离 | 至少两个 Pi 节点同时执行；操作、拖动、缩放及折叠不丢输入、不串会话、不造成全画布闪烁 |
 | P3 | OSC 7501 状态 | 覆盖五种状态、三种待介入原因、进度缺省、清理、退出、重置及异常报告；真实 Pi 事件触发节点显示 |

@@ -256,11 +256,6 @@ pub fn run(graph: Document, args: &[String]) -> Result<()> {
         args.iter().any(|arg| arg == "--home"),
     );
     editor.light = config.light;
-    #[cfg(feature = "react-editor")]
-    if args.iter().any(|arg| arg == "--react-editor") {
-        editor::react_editor::initialize()?;
-        editor.web_input = true;
-    }
     let mut interaction = Interaction::default();
     if let Some(mode) = arg(args, "--preview-tool") {
         editor.hide_home();
@@ -441,10 +436,6 @@ pub fn run(graph: Document, args: &[String]) -> Result<()> {
     );
     msdf_text::install(&mut app);
     edges::install(&mut app);
-    #[cfg(feature = "react-editor")]
-    if args.iter().any(|arg| arg == "--react-editor") {
-        editor::react_editor::install(&mut app);
-    }
     if diagnostics {
         app.add_plugins(bevy::render::diagnostic::RenderDiagnosticsPlugin);
     }

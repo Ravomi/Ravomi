@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const triples = { 'linux-x64': 'x86_64-unknown-linux-gnu', 'linux-arm64': 'aarch64-unknown-linux-gnu', 'darwin-arm64': 'aarch64-apple-darwin', 'darwin-x64': 'x86_64-apple-darwin', 'win32-x64': 'x86_64-pc-windows-msvc' };
-const executable = resolve(fileURLToPath(new URL('../../src-tauri/binaries/', import.meta.url)), `ravomi-agent-${triples[`${process.platform}-${process.arch}`]}${process.platform === 'win32' ? '.exe' : ''}`);
+const executable = resolve(fileURLToPath(new URL('../binaries/', import.meta.url)), `ravomi-agent-${triples[`${process.platform}-${process.arch}`]}${process.platform === 'win32' ? '.exe' : ''}`);
 
 test('compiled engine starts with no external runtime on PATH', () => {
   assert.match(execFileSync(executable, ['--version'], { env: { PATH: '' }, encoding: 'utf8' }), /Pi Agent Core 1.0.4/);

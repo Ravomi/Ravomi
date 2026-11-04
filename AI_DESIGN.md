@@ -2,13 +2,13 @@
 
 > 2026-10-12 MVP 优先级调整：先交付 [Pi 终端节点画布](MVP.md)，仅使用内置 Pi。终端状态通过 OSC 7501 显示，实际派生关系与 Assets 通过 Pi 结构化集成关联；状态报告不授予权限。本文完整运行领域设计继续保留，尚未实现部分不整体阻塞本轮 MVP。
 
-版本：0.7（保留原设计编号）· 更新：2026-10-12 · 状态：完整运行领域设计草案；已协调节点对话检查点需求，新增检查点/分叉契约尚未实现；React/Tauri 与原生 Bevy 已接入代码 MVP 子集。
+版本：0.7（保留原设计编号）· 更新：2026-10-12 · 状态：完整运行领域设计草案；已协调节点对话检查点需求，新增检查点/分叉契约尚未实现；原生 Bevy + `egui` 画布已接入代码 MVP 子集。
 
 > 本文定义任务、Agent、运行、上下文、工件与交接的领域契约。产品范围、功能状态和发布顺序以 [PRD](PRD.md) 为准；界面以 [DESIGN](DESIGN.md) 为准；供 AI 设计和编写界面的执行规则见 [AI_UI_RULES](AI_UI_RULES.md)。保留既有 G01–G14、G21–G33、V01–V16 与验收编号，不补造缺失编号。
 
-Ravomi 是 Arcraven 的产品。当前仓库同时包含 Rust/Bevy 画布、`app/` React/Tauri 迁移原型和 Wry 内嵌 React 输入层。`src/collaboration.rs` 与其子模块实现代码 MVP；`src/canvas_ai.rs` 为原生画布入口，`app/src/Collaboration.tsx` 保留独立原型入口。旧上游 `app/src/core/`、`packages/`、AIEngine 等模块没有因此成为本仓库已实现能力。来源见 [MIGRATION](MIGRATION.md)，当前入口见 [README](README.md#文档与项目结构) 和 [app/README](app/README.md)。
+Ravomi 是 Arcraven 的产品。当前仓库采用统一的 Rust / Bevy + `egui` 原生画布架构与内置 Pi 引擎（`agent-engine/`）。`src/collaboration.rs` 与其子模块实现代码 MVP；`src/canvas_ai.rs` 为原生画布入口。旧上游 `app/src/core/`、`packages/`、AIEngine 等模块没有因此成为本仓库已实现能力。来源见 [MIGRATION](MIGRATION.md)，当前入口见 [README](README.md#文档与项目结构) 和 [agent-engine/README](agent-engine/README.md)。
 
-原生画布的绑定保存在 `.mio` 的附件 `ravomi-code-agents.json`，关联输入节点、任务和流程编号；已连接流程可随项目归档，活动运行事实仍位于用户数据目录 `ravomi/code-collaboration-canvas/workflows.json`，完整边界见 [STORAGE](STORAGE.md)。已移除 `.prg` 支持。与 Tauri 数据目录分开，当前不做两个入口之间的会话迁移。打开画布不自动重发，但 Bevy 全局运行区仍可手动操作本机全部已载入流程；项目副本与运行控制的实例隔离尚未实现。Space 只授权本次固定输入的新流程。Skill 总结使用 `$skill` Run、固定来源证据和同一 Pi 执行器，保存经过人工编辑的内容及证据副本，不自动加载或执行 Skill。
+原生画布的绑定保存在 `.mio` 的附件 `ravomi-code-agents.json`，关联输入节点、任务和流程编号；已连接流程可随项目归档，活动运行事实仍位于用户数据目录 `ravomi/code-collaboration-canvas/workflows.json`，完整边界见 [STORAGE](STORAGE.md)。已移除 `.prg` 支持。打开画布不自动重发，但 Bevy 全局运行区仍可手动操作本机全部已载入流程；项目副本与运行控制的实例隔离尚未实现。Space 只授权本次固定输入的新流程。Skill 总结使用 `$skill` Run、固定来源证据和同一 Pi 执行器，保存经过人工编辑的内容及证据副本，不自动加载或执行 Skill。
 
 **当前子集与设计差异**：Pi Agent Core / Pi AI 1.0.4 编译为应用私有引擎；Rust 承担 DAG 调度、单任务单 Agent、固定输入快照、显式父子检查任务、取消/重试与按 Run 审阅。画布文字任务不要求外部工程。就绪任务不设固定并发、任务或调用次数上限，单次执行仍有超时和输出大小校验。持久化暂采用单后端互斥锁保护、一次替换整个快照的版本化 JSON，保留 64 MiB 校验边界；不实现本文完整 SQLite 事件模型、独立 Artifact ID 或审阅事件历史。每个 Run ID 标识一次工件版本。任务开始后计划不可修改，修订需新流程；外部会话续聊、工具循环和 Skill 自动复用待实现。画布节点目前是计划内 Agent 的空间投影。代码测试使用隔离目录但具有宿主权限；只导出人工通过的新目录，不写回原项目。完整契约仍作为后续目标，不能以本子集宣称全部完成。
 
@@ -20,7 +20,7 @@ Ravomi 是 Arcraven 的产品。当前仓库同时包含 Rust/Bevy 画布、`app
 
 ### 本轮实现架构与优先级
 
-以 [MVP](MVP.md) 与 [TODO](TODO.md) P0–P5 为当前交付契约：Bevy 负责画布和 Pi 终端网格，React + shadcn/ui 负责全部应用 UI，Tabler Icons 统一图标，迁移后移除 egui。Rust 持有文档、会话、Run 和 Assets 的事实状态，React 通过命令和订阅交互，不维护另一套执行状态机。Alacritty 为终端内核参考，现有 Wry 输入入口只提供集成基础。
+以 [MVP](MVP.md) 与 [TODO](TODO.md) P0–P5 为当前交付契约：Bevy 负责画布和 Pi 终端网格，`bevy_egui` / `egui` 负责全部应用 UI，Tabler Icons 统一图标。Rust 持有文档、会话、Run 和 Assets 的事实状态，不维护第二套执行状态机。Alacritty 为终端内核参考。
 
 本轮仅内置 Pi；Pi Subagent 用于参考子会话、等待与交接机制。真实委派事件建立直接母子身份，持久化后映射为节点和连线；OSC 7501 仅传达终端状态，不创建任务、不授予权限、不登记 Assets。协议状态按来源 PTY 及记录 ID 隔离，再映射到对应会话/Run；`done` 表示工作结束待查看，不替代工件验证和人工审阅，进程退出也不自动判为成功。
 
@@ -121,12 +121,11 @@ P0/P1/P2 是各自能力阶段的优先级。V 系列 P0 表示进入视觉扩�
 | 已有基础          | 位置                                                                                  | 可复用部分与缺口                                                |
 | ----------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | 文档与历史 | `src/document.rs`、`src/session.rs` | 复用文档命令与撤销，增加任务/工件格式需要迁移和往返验证 |
-| React/Tauri 原型 | `app/src/App.tsx`、`app/src/Collaboration.tsx`、`app/src-tauri/src/lib.rs` | 对象列表、文字编辑与代码协作；Agent 空间布局待接入 |
 | 空间画布与分组 | `src/viewer.rs`、`src/sections.rs`、`src/edges.rs` | 复用投影、关系与选择；文档连线不是运行依赖，分组不是自动团队授权 |
-| React 原位输入 | `src/react_editor.rs`、`src/edit_protocol.rs`、`app/src/canvas-editor.tsx` | 保留草稿、IME 与提交语义，不复用为第二个运行状态来源 |
+| 原位文字编辑 | `src/editor.rs` | 保留草稿、IME 与提交语义，不复用为第二个运行状态来源 |
 | 素材与图谱导出 | `src/image_import.rs`、`src/export_image.rs`、`src/export_ui.rs` | 已有附件与 PNG 基础；完整视觉图层、作业及交付清单待实现 |
 | 本地恢复 | `src/recovery.rs`、`src/recovery_ui.rs` | 文档恢复副本不能代替 Run 事务日志和副作用恢复 |
-| 执行器、上下文与存储 | `src/collaboration/`、`app/agent-engine/` | 内置 Pi、固定源码、版本化 JSON；完整事务事件模型和外部会话待实现 |
+| 执行器、上下文与存储 | `src/collaboration/`、`agent-engine/` | 内置 Pi、固定源码、版本化 JSON；完整事务事件模型和外部会话待实现 |
 | 历史 AIEngine、KV 研究 | 旧设计参考，非本地已接入模块 | Pi 已按新入口接入，不包含旧 AIEngine、MCP 工具目录或缓存服务 |
 
 ## 4. 两条贯穿用户旅程
@@ -842,10 +841,10 @@ flowchart TB
 | Workflow | 待建领域层；经 Rust 命令接口接入 | 计划、状态机、依赖、授权、预算和恢复独立于画布渲染 |
 | 执行器 Adapter | 待建运行适配层 | 模型 API、外部会话、本地进程等能力差异；不承担画布编辑 |
 | 任务与工件投影 | `src/document.rs` / `src/session.rs` 周边，正式 schema 待定 | 稳定身份、版本与编辑命令；运行事件不伪装成普通撤销历史 |
-| 画布与应用 UI | `src/viewer.rs` / `src/editor.rs` 和 `app/src/` | 分别验证现有与迁移入口，按 DESIGN 呈现统一交互，不承诺已功能对等 |
+| 画布与应用 UI | `src/viewer.rs` / `src/editor.rs` 及 `egui` 界面模块 | 按 DESIGN 呈现统一交互 |
 | 视觉编辑 | 待建独立设计领域；复用现有附件/导出基础 | 草稿、图层、品牌、反馈与规格；不把库实例写入文档 |
-| 保存与迁移 | `src/document.rs` 及后续明确的运行存储 | `.prg` 兼容、资产引用和运行事务；恢复副本不是调度日志 |
-| 本地宿主 | `app/src-tauri/` 及适用的 Rust 服务 | 受限文件访问、进程、工作区与平台生命周期 |
+| 保存与迁移 | `src/document.rs` 及后续明确的运行存储 | `.mio` 保存、资产引用和运行事务；恢复副本不是调度日志 |
+| 本地宿主 | `src/` 原生桌面宿主及适用的 Rust 服务 | 受限文件访问、进程、工作区与平台生命周期 |
 
 这些是接入边界，不是已经创建的新模块。优先把完整行为封装在少量模块，按实际选定的入口验证，不为模仿历史上游而创建 `app/src/core/` 服务树或 `packages/`。
 
@@ -893,11 +892,11 @@ interface ExecutorAdapter {
 
 ### 14.6 Pi、Chord 与 Bevy 的位置
 
-Pi Agent Core / Pi AI 1.0.4 已编译内置为代码 MVP 的执行器，Rust 管理 Run 与持久化；版本及平台边界见本文开头和 `app/agent-engine/package.json`。接受请求、停止生成和稳定完成仍是不同事实。当前单次执行协议不表示已支持从项目检查点恢复原 Pi 会话；新对话能力需要独立适配与验证。
+Pi Agent Core / Pi AI 1.0.4 已编译内置为代码 MVP 的执行器，Rust 管理 Run 与持久化；版本及平台边界见本文开头和 `agent-engine/package.json`。接受请求、停止生成和稳定完成仍是不同事实。当前单次执行协议不表示已支持从项目检查点恢复原 Pi 会话；新对话能力需要独立适配与验证。
 
 Chord Delta 面向严格 JSON，不直接处理带循环/别名的 Stage 类图，也不提供本项目所需的持久化、排序与恢复保证。仅在事件投影确有瓶颈时评估对独立 DTO 使用。
 
-Bevy 是当前已存在的画布基线，React/Tauri 是正在验证的应用迁移入口，Wry/React 为独立文字输入适配层。创作和运行事实独立于渲染器。迁移前必须覆盖中文输入、图层编辑嵌入、图片解码、导出一致性、现有节点类型和各目标平台，不能只凭 FPS 决定整体替换。
+Bevy + `egui` 是应用统一的画布与界面架构。创作和运行事实独立于渲染器。演进时必须覆盖中文输入、图层编辑嵌入、图片解码、导出一致性、现有节点类型和各目标平台，不能只凭 FPS 决定整体替换。
 
 ## 15. Jaaz 与 Lovart 参考、依赖复用决策
 
@@ -1062,7 +1061,7 @@ Magic 入口会调用 Jaaz 云服务，不能据此认为整条 Magic 链已具�
 - 核心协作真实后端冒烟：显式输入的单任务执行、双 Agent 的指定版本交接、子代理职责与权限范围、独立分支并行、运行中修改未派发任务、暂停派发、停止/查询与人工审阅。记录执行器及适配器版本，不把模拟响应当成已接入。
 - 视觉扩展真实后端冒烟：生成、参考编辑、蒙版、用量与取消/查询能力，记录模型与适配器版本；不以相同 Prompt 的像素一致性作保证。该专项不替代核心协作验收。
 - 视觉验收：中文/英文长文案、透明 Logo、复杂参考图、缺失字体、不同缩放与 DPR；导出读取尺寸，并比较蒙版外像素和关键图层。
-- 实现入口分别按根目录 [AGENTS](AGENTS.md) 与 [app 验证说明](app/README.md) 执行相关检查。本文 TypeScript 接口仅表达领域契约，不要求在 Rust 中照搬前端目录和工具链。文档更新不表示这些 AI 验收已执行。
+- 实现入口分别按根目录 [AGENTS](AGENTS.md) 与 [agent-engine 说明](agent-engine/README.md) 执行相关检查。本文 TypeScript 接口仅表达领域契约，不要求在 Rust 中照搬前端目录和工具链。文档更新不表示这些 AI 验收已执行。
 
 ## 19. 风险、默认决策与待验证项
 

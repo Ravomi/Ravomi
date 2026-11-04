@@ -14,6 +14,6 @@
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
     <key>NSHighResolutionCapable</key><true/>
-    <key>NSHumanReadableCopyright</key><string>Graplu contributors. GPL-3.0-only.</string>
+    <key>NSHumanReadableCopyright</key><string>Ravomi contributors. GPL-3.0-only.</string>
 </dict>
 </plist>

@@ -4,7 +4,6 @@ use std::{collections::BTreeMap, error::Error, fs::File, io::Read, path::Path};
 pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
 pub mod collaboration;
 pub mod document;
-pub mod edit_protocol;
 pub mod project;
 pub mod project_history;
 mod project_package;

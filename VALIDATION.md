@@ -2,13 +2,13 @@
 
 本文件是按日期保留的工程证据索引。历史段落中的“当前”、Graplu / H&M 名称、配色、界面和测试结论均指对应测试当时的版本；它们不自动证明 Ravomi 新 UI 或 Agent 产品能力已经验收。原有日期、环境、结果、截图和测试数保持原样。
 
-当前产品契约见 [PRD](PRD.md)，UI/UX 验收依据见 [DESIGN](DESIGN.md)，AI 生成与实现界面的执行规则见 [AI_UI_RULES](AI_UI_RULES.md)，品牌资源状态见 [BRAND](assets/branding/BRAND.md)。实际工程入口见 [DEVELOPMENT](DEVELOPMENT.md) 与 [app/README](app/README.md)。AI 执行与编排尚未接入；对象列表、静态设计图或模拟 IPC 不能作为多 Agent 协作已完成的证据。
+当前产品契约见 [PRD](PRD.md)，UI/UX 验收依据见 [DESIGN](DESIGN.md)，AI 生成与实现界面的执行规则见 [AI_UI_RULES](AI_UI_RULES.md)，品牌资源状态见 [BRAND](assets/branding/BRAND.md)。实际工程入口见 [DEVELOPMENT](DEVELOPMENT.md) 与 [agent-engine/README](agent-engine/README.md)。AI 执行与编排按实际源码记录；静态设计图或模拟测试不能作为多 Agent 协作已完成的证据。
 
 ## 新规范的增量验收要求
 
 以下是后续实现的验收要求，本次文档统一没有运行这些测试，也不新增通过结论。
 
-- 区分被测入口：Bevy 原生画布、React/Tauri 应用、Wry/React 编辑层分别记录产物、版本、环境及范围，不能互借平台结果。
+- 记录被测产物、版本、环境及范围，不同平台不互借结果。
 - 检查素净界面层次、正文与控件清晰度、状态可辨识性、缩远后的模块和连线，以及键盘、焦点、窄窗口和深浅主题。小猫局部柔光与颗粒不能影响任务内容或命中区域；猫保持一体团子、双耳双眼，无嘴、鼻、尾和脚。
 - Agent 接入后按真实流程验证：创建任务、拆解 TODO、查看输入与产物、连接模块、并行推进、携带明确上下文交接，以及暂停、调整、失败重试和人工审核。每项标注真实执行或模拟范围；未实现项写明未实现，不记为通过。
 - 保存同场景截图和实际操作结果；新的设计规范、视觉概念图、自动截图成功或历史测试数均不能替代新版本的交互验收。

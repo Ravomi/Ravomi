@@ -27,10 +27,8 @@ pub(super) enum RedrawMode {
     Loading,
     Continuous,
 }
-#[allow(clippy::too_many_arguments)] // Independent activity resources determine the wake interval.
 pub(super) fn redraw(
     config: Res<Config>,
-    editor: Res<editor::Editor>,
     physics: Res<physics::PhysicsEditor>,
     cache: Res<msdf_text::MsdfCache>,
     effects: Res<effects::Effects>,
@@ -46,10 +44,7 @@ pub(super) fn redraw(
         || zoom.is_some_and(|zoom| zoom.active())
     {
         RedrawMode::Continuous
-    } else if text.pending_glyphs > 0
-        || text.pending_labels > 0
-        || (editor.web_input && editor.active.is_some())
-    {
+    } else if text.pending_glyphs > 0 || text.pending_labels > 0 {
         RedrawMode::Loading
     } else {
         RedrawMode::Idle

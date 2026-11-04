@@ -2,10 +2,6 @@ use super::*;
 use bevy_egui::{EguiContexts, egui};
 use std::sync::{Mutex, mpsc};
 
-#[cfg(feature = "react-editor")]
-#[path = "react_editor.rs"]
-pub(super) mod react_editor;
-
 fn layout_text(
     ctx: &egui::Context,
     text: &str,
@@ -409,7 +405,6 @@ pub struct EditSession {
 
 #[derive(Resource, Default)]
 pub struct Editor {
-    pub(super) web_input: bool,
     pub(super) export: super::export_ui::Export,
     pub(super) recovery: super::recovery_ui::Recovery,
     pub overview: section_overview::Overview,
@@ -1073,14 +1068,9 @@ pub fn ui(
         }
     }
     let active_at_start = editor.active.is_some();
-    let web_input = editor.web_input;
     let mut ime_frame = false;
     if let Some(edit) = &mut editor.active {
-        ime_frame = if web_input && !edit.edge {
-            edit.composing
-        } else {
-            ctx.input(|i| composition_frame(&mut edit.composing, &i.events))
-        };
+        ime_frame = ctx.input(|i| composition_frame(&mut edit.composing, &i.events));
     }
     let (transform, projection) = &mut *camera;
     let Projection::Orthographic(projection) = &mut **projection else {
@@ -1477,11 +1467,8 @@ pub fn ui(
     // Waiting for release swallowed the first half of an empty-canvas double click.
     let mut canvas_press_handoff = false;
     let serial = editor.serial;
-    let web_input = editor.web_input;
     if let Some(edit) = &mut editor.active {
-        if !web_input || edit.edge {
-            (commit, enter_commit) = ctx.input_mut(|i| edit_shortcut(i, ime_frame, window.focused));
-        }
+        (commit, enter_commit) = ctx.input_mut(|i| edit_shortcut(i, ime_frame, window.focused));
         if edit.edge {
             egui::Window::new("连线标题")
                 .frame(theme::tool_frame(light))
@@ -1513,11 +1500,6 @@ pub fn ui(
                     }
                     ui.label("Enter 完成 · Shift+Enter 换行");
                 });
-        } else if web_input {
-            // The native WebView owns draft input, focus and IME composition.
-            if window.focused && !ime_frame && !edit.focus {
-                commit |= ctx.input(|input| input.pointer.primary_clicked());
-            }
         } else if let Some(node) = scene.0.nodes.iter().find(|n| n.id == edit.id) {
             let zoom = ctx.zoom_factor();
             let screen = (center(node) - transform.translation.truncate()) / projection.scale;

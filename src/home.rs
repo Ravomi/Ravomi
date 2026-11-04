@@ -1518,9 +1518,11 @@ mod tests {
         assert!(texts.iter().any(|t| t == "最近打开"), "texts: {texts:?}");
         assert!(!texts.iter().any(|t| t.contains("你的工作空间")));
         assert!(!texts.iter().any(|t| t.contains("让灵感安静生长")));
-        assert!(!texts
-            .iter()
-            .any(|t| t.contains("记录、连接，逐步展开你的工作。")));
+        assert!(
+            !texts
+                .iter()
+                .any(|t| t.contains("记录、连接，逐步展开你的工作。"))
+        );
 
         let search_box = ctx
             .read_response(egui::Id::new("home-search-box"))
