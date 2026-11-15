@@ -1,189 +1,71 @@
 <div align="center">
 
-**English** | [中文](README-ZH.md)
+<!-- Header Typing SVG -->
+<a href="https://github.com/Ravomi">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=3000&pause=1200&color=6366F1&center=true&vCenter=true&width=650&lines=Hi%2C+I'm+Ravomi+%F0%9F%91%8B;Building+a+shared+canvas+for+people+%26+AI+agents;Visible.+Connected.+Controllable." alt="Typing SVG" />
+</a>
 
-<img src="assets/branding/ravomi-logo.png" alt="Ravomi: a graphite-black cat beside the wordmark" width="640" />
+<p>
+  <strong>Builder at Arcraven</strong> · Crafting tools for AI agents, knowledge graphs, and developer workflows
+</p>
 
-**A shared canvas for people and AI agents.**
-
-Arcraven · A visible, connected, controllable multi-agent workspace
-
-[![License: GPL-3.0-only](https://img.shields.io/badge/License-GPL--3.0--only-535762?style=flat-square)](LICENSE)
-[![Status: Prototype](https://img.shields.io/badge/Status-Prototype-838BA3?style=flat-square)](#current-progress)
-
-[Overview](#overview) · [Preview](#preview) · [Quick start](#quick-start) · [Roadmap](#roadmap) · [Contributing](#contributing)
+<!-- Badges -->
+<p>
+  <a href="https://waya.ink">
+    <img src="https://img.shields.io/badge/Blog-waya.ink-F59E0B?style=flat-square&logo=rss&logoColor=white" alt="Blog" />
+  </a>
+  <a href="https://github.com/Ravomi?tab=repositories">
+    <img src="https://img.shields.io/badge/Projects-8%20Public%20Repos-6366F1?style=flat-square&logo=github&logoColor=white" alt="Repos" />
+  </a>
+  <img src="https://img.shields.io/badge/Focus-AI%20Agents%20%26%20Systems-10B981?style=flat-square" alt="Focus" />
+</p>
 
 </div>
 
-<a id="产品概述"></a>
+---
 
-## Overview
+### ✨ About Me
 
-**Ravomi is an infinite-canvas workspace for multi-agent collaboration, being built by Arcraven.** It brings agents, code, assets, tasks, and subagents into connectable modules, so you can understand the whole project and step into any branch to move the work forward.
+- 🔭 Currently building **Arcraven** — *a shared canvas for people and AI agents: visible, connected, controllable.*
+- 🍞 Writing & baking notes at **[Waya's Bakery (waya.ink)](https://waya.ink)**
+- ⚡ Interested in **AI Agent Infrastructure**, **Rust**, **Knowledge Graphs**, and **Embedded / Router Gateways**
 
-The intended workflow starts with a goal, a reference, or a task. AI breaks it into TODOs, assigns work, coordinates the workflow, and hands the necessary context and results between agents. You can follow progress, adjust plans, add input, and review results while other branches continue independently.
+---
 
-| Start with | Work together | Work toward |
-| --- | --- | --- |
-| Goals, tasks, code, references, and assets | Organize modules on a canvas; let agents divide work, run in parallel, hand off, and bring results together | Traceable results and a process you can understand and influence throughout |
+### 🚀 Featured Projects
 
-Ravomi is designed around three qualities:
+| Project | Description | Stack |
+| :--- | :--- | :--- |
+| **[luci-app-magpie](https://github.com/Ravomi/luci-app-magpie)** | Centralized AI Reverse-Proxy Gateway & Model Router for OpenWrt / ImmortalWrt with LuCI Web UI | `JavaScript` `OpenWrt` |
+| **[obsidian-wikigraph](https://github.com/Ravomi/obsidian-wikigraph)** | Explore concepts like Wikipedia with AI explanations, a live force-directed relationship graph, and one-click vault export | `JavaScript` `Obsidian` |
+| **[justrust](https://github.com/Ravomi/justrust)** | Ultra fast Rust compile workflow tailored for coding agents | `Rust` `AI Agents` |
+| **[Blog](https://github.com/Ravomi/Blog)** | 🍞 Waya's Bakery — Personal blog & technical notes (`waya.ink`) | `CSS` `Web` |
 
-- **Visible**: See who is doing what, which inputs they depend on, which version they produced, and where your decision is needed.
-- **Connected**: Make tasks, code, and assets reusable modules with clear relationships, dependencies, and context sources.
-- **Controllable**: Change assignments, revise plans, request a stop, or review results while keeping room to work on other independent branches.
+---
 
-> **Current stage: a native canvas with an embedded Pi code collaboration MVP.** Select text/group blocks and press Space to plan and execute tasks; each planned Agent gets a collapsible canvas node with run records. Canvas text tasks require no external code folder, and their records are included when saving `.mio`. Configure the model and optional source attachments in “画布协作”. Ready Agents run without a fixed concurrency or task-count cap. Select Agent nodes to summarize fixed runs into an editable, project-local Skill. One-level dynamic delegation is implemented with local regression coverage; remote model acceptance is pending a working credential. See [subagent validation](validation/subagent-delegation.md). Image workflows and automatic Skill reuse remain planned. See [canvas workflow validation](validation/canvas-ai-workflows.md) for tested scope.
-
-<a id="界面预览"></a>
-
-## Preview
+### 🛠️ Tech Stack
 
 <div align="center">
 
-<img src="assets/branding/ravomi-workspace-concept.png" alt="Ravomi workspace concept: a quiet canvas connecting planning, research, development, and visual agents, with task details on the right" width="100%" />
-
-<sub>Target UI concept, including planned agent collaboration features. This is not a screenshot of the current application.</sub>
+![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Tauri](https://img.shields.io/badge/Tauri-24C8D8?style=for-the-badge&logo=tauri&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
 </div>
 
-The interface stays quiet: a muted gray-violet shell, a warm-white workspace, clear text and connections, and details revealed when needed. A graphite-black cat carries a restrained sense of mystery through local misty blue-violet light and fine grain. The work itself remains clear and readable.
+---
 
-See the [UI/UX specification](DESIGN.md) for layout, states, keyboard interaction, and accessibility, and the [brand guidelines](assets/branding/BRAND.md) for the character and wordmark. Actual prototype screenshots and their test environments are documented in the [validation records](VALIDATION.md).
+### 📊 GitHub Stats
 
-<a id="从目标到成果"></a>
+<div align="center">
+  <img height="165" src="https://github-readme-stats.vercel.app/api?username=Ravomi&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0D1117" alt="Ravomi's GitHub Stats" />
+  <img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Ravomi&layout=compact&theme=tokyonight&hide_border=true&bg_color=0D1117" alt="Top Languages" />
+</div>
 
-## From a goal to a result
-
-For a goal such as “prepare a product launch,” the full collaboration experience is designed to work like this:
-
-1. **Add the goal and references**: Place the launch brief, product notes, code, and reference assets on the canvas.
-2. **Plan and assign**: A planning agent creates TODOs with completion criteria and connects research, development, and visual tasks.
-3. **Move forward in parallel**: Agents handle their assignments and delegate to subagents when needed. You can keep organizing references or work on another branch.
-4. **Hand off and combine**: Downstream tasks receive specific versions of results and the necessary context, preserving sources and dependencies.
-5. **Review and adjust**: Inspect results, add feedback, retry, or reassign work until the deliverable is ready.
-
-The canvas shows relationships; task scope and selected inputs determine what actually runs. Each run records one attempt, and results retain their versions. Connecting modules does not automatically execute commands or publish content. See the [AI execution design](AI_DESIGN.md) for run and handoff contracts.
-
-<a id="当前进展"></a>
-
-## Current progress
-
-The repository provides a unified native Rust (`Bevy` + `egui`) infinite-canvas workspace and bundled Pi agent engine:
-
-| Module | Available today | Work remaining |
-| --- | --- | --- |
-| **Rust / Bevy + egui canvas** | Text nodes, connections, nested groups, image import, search, zoom and pan, undo and redo, `.mio` saving and recovery copies, PNG export | Interactive Pi terminal nodes, everyday editing refinements, and cross-platform validation |
-| **Bundled Pi engine (`agent-engine/`)** | Space-triggered planning and execution, collapsible Agent cards, one-level dynamic subagent delegation, and project-local Skill drafting | Image workflows, automatic Skill reuse, and remote model acceptance |
-
-Editing and rendering have been validated on Linux. Native startup and DMG packaging have received limited validation on Apple Silicon macOS; see the [macOS notes](packaging/macos/README.md). Windows and mobile platforms have not completed full runtime validation. See the [validation records](VALIDATION.md) for format compatibility and known issues.
-
-<a id="快速开始"></a>
-
-## Quick start
-
-<a id="1-准备环境"></a>
-
-### 1. Prepare your environment
-
-| Dependency | Requirement |
-| --- | --- |
-| Rust | Version 1.95 or later, including Cargo |
-| Desktop build environment | C / C++ build tools and platform-specific windowing and graphics dependencies |
-| Linux runtime | X11 / Wayland, Vulkan drivers, Fontconfig, and CJK fonts |
-
-See the [development guide](DEVELOPMENT.md) for platform dependencies and runtime options. The current canvas does not require a model API key.
-
-<a id="2-获取源码并启动画布"></a>
-
-### 2. Get the source and launch the canvas
-
-```sh
-git clone https://github.com/Ravomi/ravomi-app.git
-cd ravomi-app
-./run.sh
-```
-
-The launcher builds the application as needed and opens the home screen. Choose “新建草稿” (New draft) to start editing, or open an existing `.mio` project.
-
-To open a specific file and use a local CJK font:
-
-```sh
-./run.sh /absolute/path/example.mio --font /path/to/your-cjk-font.ttf
-```
-
-On Linux, the default font path is `/usr/share/fonts/google-noto-sans-cjk-fonts/NotoSansCJK-Regular.ttc`. Use `--font` if the font is installed elsewhere.
-
-<a id="3-创建第一张画布"></a>
-
-### 3. Create your first canvas
-
-| Action | Control |
-| --- | --- |
-| Create / edit a text node | Double-click an empty area / a text node |
-| Finish editing / insert a line break | Enter / Shift+Enter |
-| Zoom / pan | Scroll wheel / middle-button drag or Space+left-button drag |
-| Select multiple nodes / group | Shift+click / Ctrl+G |
-| Connect nodes | Right-button drag from one node to another |
-| Undo / redo / save | Ctrl+Z / Ctrl+Shift+Z / Ctrl+S |
-| Fit the canvas in view | F |
-
-These are the default desktop controls. See the [development guide](DEVELOPMENT.md) for trackpad behavior, macOS modifier keys, and input focus rules. Saving writes to the original file; recovery copies remain separate files.
-
-<a id="路线图"></a>
-
-## Roadmap
-
-| Stage | Focus | Status |
-| --- | --- | --- |
-| Canvas foundation | Local documents, module connections, editing, saving, and export | Prototype available; being refined |
-| Everyday workspace | Native Bevy + egui UI, input and zoom, recovery, and platform validation | In progress |
-| Single-task execution | Selected inputs, executor calls, results, retries, and reopening tasks | Native canvas code MVP |
-| Multi-agent collaboration | TODO orchestration, parallel branches, subagents, versioned handoffs, and human review | Native canvas code MVP; interactive terminal nodes in progress |
-| Reusable modules and extensions | Multiple executors, composed modules, and research, coding, and visual workflows | Planned |
-
-The first complete collaboration workflow starts with one goal, two parallel branches, one subagent delegation, one merge of versioned results, and one human review. See the [PRD](PRD.md) for scope, dependencies, and acceptance criteria.
-
-<a id="文档与项目结构"></a>
-
-## Documentation and project structure
-
-| Document | Contents |
-| --- | --- |
-| [Product definition](PRD.md) | Scope, user journeys, stages, and acceptance criteria |
-| [UI/UX specification](DESIGN.md) | Layout, visual hierarchy, components, states, and accessibility |
-| [AI UI rules](AI_UI_RULES.md) | Constraints for AI-assisted interface design and implementation |
-| [AI execution design](AI_DESIGN.md) | Contracts for agents, tasks, context, artifacts, and scheduling |
-| [Development guide](DEVELOPMENT.md) · [Development conventions](AGENTS.md) | Entry points, environment, checks, and collaboration practices |
-| [Validation records](VALIDATION.md) | Completed checks, environments, and known limitations |
-
-```text
-src/           Rust document core, history and recovery, Bevy + egui canvas
-agent-engine/  Bundled Pi agent engine
-assets/        Brand assets, icons, and fonts
-packaging/     Platform packaging and integration
-validation/    Validation records and screenshots
-vendor/        Dependencies with preserved source and change records
-```
-
-Most development and design documents are currently written in Chinese. The [Chinese README](README-ZH.md) covers the same product overview and setup instructions.
-
-<a id="参与开发"></a>
-
-## Contributing
-
-Use [Issues](https://github.com/Ravomi/ravomi-app/issues) to report problems, suggest use cases, or discuss design. Contributions to code, documentation, and tests are welcome. For interaction issues, include reproduction steps, the entry point used, your operating system, and display scaling. For file issues, provide a minimal example with sensitive content removed.
-
-Read the [development conventions](AGENTS.md) before contributing. Keep independent changes in separate, reversible commits and run the relevant checks. For interface changes, verify both the [design specification](DESIGN.md) and the actual interaction. Install new skills only in the project's `.agents/skills/` directory.
-
-<a id="致谢与许可"></a>
-
-## Acknowledgments and license
-
-Ravomi is developed by Arcraven and builds on parts of the Project Graph / Graplu prototypes and their `.prg` compatibility conventions. We thank the upstream authors, open-source dependency maintainers, and everyone contributing code, design, documentation, and tests. See [MIGRATION](MIGRATION.md) for source and migration records, and [CREDITS](CREDITS.md) for the full acknowledgments index.
-
-The project is licensed under [GPL-3.0-only](LICENSE). Third-party components retain their own copyright notices and licenses. See [BRAND](assets/branding/BRAND.md) for brand asset information.
-
-## Native project files
-
-Ravomi projects use `.mio`: a SQLite document containing canvas objects, ordered graph relationships, assets, and explicitly selected collaboration history. Schema 3 updates changed records in a transaction and shares content by SHA-256. Existing ZIP `.mio` v1/v2 remain readable and upgrade on save. PRG reading, writing, recovery, and file associations are no longer supported. Opening a project never resumes archived runs; local execution records remain separate. See the [storage specification](STORAGE.md) for the schema and current limits.
+<div align="center">
+  <br />
+  <sub>✨ <em>"Visible, connected, controllable."</em></sub>
+</div>
